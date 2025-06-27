@@ -1,0 +1,22 @@
+/excel-clone/
+│
+├── index.html
+├── style.css
+├── /assets/                  # Icons or UI assets (optional)
+├── /data/
+│   └── sample.json           # 50,000 JSON entries
+├── /scripts/
+│   ├── main.js               # App entry point
+│   ├── grid.js               # Grid renderer and controller
+│   ├── row.js                # Row class (resizing, height)
+│   ├── column.js             # Column class (resizing, width)
+│   ├── cell.js               # Individual cell class (value, editing)
+│   ├── selection.js          # Handles selection logic
+│   ├── range.js              # For range selections
+│   ├── stats.js              # For sum, avg, min, max, count
+│   ├── commands/
+│   │   ├── command.js        # Base Command class
+│   │   ├── editCommand.js    # For cell edit
+│   │   ├── resizeRowCommand.js
+│   │   └── resizeColCommand.js
+│   └── undoRedo.js           # History stack manager

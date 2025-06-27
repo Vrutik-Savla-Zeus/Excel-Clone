@@ -1,0 +1,116 @@
+Absolutely, Vrutikkk — those are excellent additions and will give your Excel clone a **true spreadsheet-like UX**. Here's a **clear, sequential roadmap** with all major features grouped in logical steps.
+
+---
+
+## ✅ What’s Done So Far (Step 01–03)
+
+* Canvas rendering engine
+* Virtual scrolling with performance
+* DPR scaling (sharp lines)
+* Viewport-aligned rendering logic
+
+---
+
+## 🔜 **Next Steps (Step 04 onward)**
+
+### 🧩 **STEP 04: Row & Column Headers (Fixed UI)**
+
+* Display row numbers (1, 2, 3...) on left
+* Display column names (A, B, C...) on top
+* Keep them sticky while scrolling
+* Use `<div>` or `<canvas>` for headers (your call)
+
+---
+
+### 🧱 **STEP 05: Cell Selection**
+
+* Click to select a single cell
+* Highlight border
+* Support arrow key navigation
+* Update selected cell state
+
+---
+
+### 🔧 **STEP 06: Cell Editing**
+
+* Double-click to edit
+* Render input box over canvas (absolutely positioned)
+* On blur or Enter, update data model and re-render
+
+---
+
+### 📐 **STEP 07: Column & Row Resizing**
+
+* On hover near cell edge → show resize cursor
+* On drag → dynamically resize width/height
+* Update internal arrays + re-render
+
+---
+
+### 🔢 **STEP 08: Load Data (JSON)**
+
+* Generate 50,000 sample rows
+* Display them inside the grid
+* Support typed values (number, string)
+
+---
+
+### 🔍 **STEP 09: Selection Enhancements**
+
+* Shift+Click = range selection
+* Drag selection via mouse
+* Support selection rectangles
+
+---
+
+### 📊 **STEP 10: Aggregation Panel**
+
+* On selecting numeric cells:
+
+  * Show count, sum, average, min, max
+* Fixed footer panel (or floating)
+
+---
+
+### ♻️ **STEP 11: Undo / Redo System**
+
+* Implement Command Pattern
+* Support for:
+
+  * Cell edits
+  * Resizing
+  * Insert/Delete
+* `undo()`, `redo()` via buttons or hotkeys
+
+---
+
+### ➕ **STEP 12: Insert/Delete Rows/Columns**
+
+* Right-click (or button)
+
+  * Insert row above/below
+  * Delete row
+  * Insert column left/right
+  * Delete column
+* Adjust internal model + re-render
+
+---
+
+### 🎨 **STEP 13: UI Panel for Actions**
+
+* Mini toolbar (Insert, Delete, Format)
+* Visible above grid
+* You can float it, fix it, or dock it
+
+---
+
+## 🚀 Bonus (Optional Final Touches)
+
+* Copy/Paste
+* Keyboard nav
+* Export to CSV
+* Frozen panes (like Excel)
+
+---
+
+Let me know when you're ready to move to **STEP 04: Fixed headers (row + column)**, and I’ll give you the **Part 1 Task + Implementation Guide** exactly as we planned earlier.

@@ -1,0 +1,33 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: scroll;
+  position: relative;
+}
+
+.canvas-wrapper {
+  position: relative;
+
+  /* will be set in JS */
+  width: 50000px;
+  height: 2500000px;
+}
+
+.excel-canvas {
+  position: sticky;
+  top: 0;
+  left: 0;
+
+  /* will be set in JS */
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 10;
+  background-color: transparent;
+}
