@@ -3,12 +3,15 @@
   margin: 0;
   padding: 0;
 }
-
 .canvas-container {
   width: 100vw;
   height: 100vh;
   overflow: scroll;
   position: relative;
+
+  /* padding-right: 17px;
+  padding-bottom: 17px;
+  box-sizing: content-box; */
 }
 
 .canvas-wrapper {
@@ -21,8 +24,8 @@
 
 .excel-canvas {
   position: sticky;
-  top: 0;
-  left: 0;
+  top: 25px;
+  left: 50px;
 
   /* will be set in JS */
   width: 100vw;
@@ -30,4 +33,33 @@
 
   z-index: 10;
   background-color: transparent;
+
+  border-top: 0.5px solid #ccc;
+  border-left: 0.5px solid #ccc;
+}
+
+.header-canvas {
+  position: fixed;
+  top: 0;
+  left: 50px;
+
+  width: 100px;
+  height: 25px;
+
+  z-index: -10;
+  background-color: transparent;
+  border-left: 0.5px solid #ccc;
+}
+
+.index-canvas {
+  position: fixed;
+  top: 25px;
+  left: 0;
+
+  width: 100px;
+  height: 25px;
+
+  z-index: -10;
+  background-color: transparent;
+  border-top: 0.5px solid #ccc;
 }

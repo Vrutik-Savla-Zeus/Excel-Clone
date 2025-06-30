@@ -7,6 +7,10 @@ export class Grid {
    * @param {HTMLDivElement} canvasContainer - Scrollable container element.
    * @param {HTMLCanvasElement} canvas -Canvas element to render on.
    * @param {CanvasRenderingContext2D} ctx Canvas 2d rendering context.
+   * @param {HTMLCanvasElement} canvasHeader -Canvas element to render on.
+   * @param {CanvasRenderingContext2D} ctxHeader Canvas 2d rendering context.
+   * @param {HTMLCanvasElement} canvasIndex -Canvas element to render on.
+   * @param {CanvasRenderingContext2D} ctxIndex Canvas 2d rendering context.
    * @param {number} totalRows - Total number of rows.
    * @param {number} totalColumns - Total number of columns.
    * @param {number} cellWidth - Width of each cell.
@@ -16,6 +20,10 @@ export class Grid {
     canvasContainer,
     canvas,
     ctx,
+    canvasHeader,
+    ctxHeader,
+    canvasIndex,
+    ctxIndex,
     totalRows,
     totalColumns,
     cellWidth,
@@ -27,6 +35,15 @@ export class Grid {
     this.canvas = canvas;
     /** @type {CanvasRenderingContext2D} */
     this.ctx = ctx;
+
+    /** @type {HTMLCanvasElement} */
+    this.canvasHeader = canvasHeader;
+    /** @type {CanvasRenderingContext2D} */
+    this.ctxHeader = ctxHeader;
+    /** @type {HTMLCanvasElement} */
+    this.canvasIndex = canvasIndex;
+    /** @type {CanvasRenderingContext2D} */
+    this.ctxIndex = ctxIndex;
 
     /** @type {number} */
     this.totalRows = totalRows;
@@ -49,23 +66,6 @@ export class Grid {
    * Sets up canvas dimensions, scales for device pixel ratio, create row/column metadata.
    */
   _init() {
-    const dpr = window.devicePixelRatio || 1;
-
-    // Storing viewport size
-    this.viewWidth = this.canvasContainer.clientWidth;
-    this.viewHeight = this.canvasContainer.clientHeight;
-
-    // Set canvas to screen size (Internal Resolution)
-    this.canvas.width = this.viewWidth * dpr;
-    this.canvas.height = this.viewHeight * dpr;
-
-    // Set CSS(visual) canvas size
-    this.canvas.style.width = `${this.viewWidth}px`;
-    this.canvas.style.height = `${this.viewHeight}px`;
-
-    // Scales the canvas coordinate system to match the DPR
-    this.ctx.scale(dpr, dpr);
-
     // Set Grid Size on Wrapper Div
     const wrapper = document.getElementById("canvasWrapper");
     wrapper.style.width = `${this.totalColumns * this.cellWidth}px`;
@@ -80,9 +80,9 @@ export class Grid {
   }
 
   /**
-   * Adjusts canvas size on zooming in or out, by calculating DPR too.
+   * Renders the grid lines on canvas using stroke().
    */
-  resizeCanvas() {
+  render() {
     const dpr = window.devicePixelRatio || 1;
 
     // Get new viewport size
@@ -100,12 +100,7 @@ export class Grid {
     // Reset context and scale
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(dpr, dpr);
-  }
 
-  /**
-   * Renders the grid lines on canvas using stroke().
-   */
-  render() {
     const scrollLeft = this.canvasContainer.scrollLeft;
     const scrollTop = this.canvasContainer.scrollTop;
     const viewportWidth = this.canvasContainer.clientWidth;
@@ -146,5 +141,110 @@ export class Grid {
     this.ctx.lineWidth = 1;
     this.ctx.stroke();
     this.ctx.restore();
+  }
+
+  renderHeader() {
+    const dpr = window.devicePixelRatio || 1;
+
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const viewWidth = this.canvasContainer.clientWidth;
+    const viewHeight = this.canvasContainer.clientHeight;
+
+    // Column Headers
+    this.ctxHeader.canvas.width = viewWidth * dpr;
+    this.ctxHeader.canvas.height = this.cellHeight * dpr;
+    this.ctxHeader.canvas.style.width = `${viewWidth}px`;
+    this.ctxHeader.canvas.style.height = `${this.cellHeight}px`;
+    this.ctxHeader.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctxHeader.scale(dpr, dpr);
+    this.ctxHeader.clearRect(0, 0, viewWidth, this.cellHeight);
+    const startCol = Math.floor(scrollLeft / this.cellWidth);
+    const endCol = Math.min(
+      this.totalColumns,
+      startCol + Math.ceil(viewWidth / this.cellWidth) + 1
+    );
+
+    this.ctxHeader.font = "12px Arial";
+    this.ctxHeader.textAlign = "center";
+    this.ctxHeader.textBaseline = "middle";
+    this.ctxHeader.fillStyle = "#111";
+
+    for (let j = startCol; j < endCol; j++) {
+      const x = j * this.cellWidth - scrollLeft;
+      const label = this._getColumnLabel(j);
+      this.ctxHeader.fillText(
+        label,
+        x + this.cellWidth / 2,
+        this.cellHeight / 2
+      );
+    }
+
+    this.ctxHeader.beginPath();
+    for (let j = startCol; j <= endCol; j++) {
+      const x = j * this.cellWidth - scrollLeft + 0.5;
+      this.ctxHeader.moveTo(x, 0);
+      this.ctxHeader.lineTo(x, this.cellHeight);
+    }
+
+    this.ctxHeader.strokeStyle = "#ccc";
+    this.ctxHeader.lineWidth = 1;
+    this.ctxHeader.stroke();
+    this.ctxHeader.restore();
+  }
+
+  renderIndex() {
+    const dpr = window.devicePixelRatio || 1;
+
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const viewWidth = this.canvasContainer.clientWidth;
+    const viewHeight = this.canvasContainer.clientHeight;
+
+    // Row Headers
+    this.ctxIndex.canvas.width = 50 * dpr;
+    this.ctxIndex.canvas.height = viewHeight * dpr;
+    this.ctxIndex.canvas.style.width = `50px`;
+    this.ctxIndex.canvas.style.height = `${viewHeight}px`;
+    this.ctxIndex.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctxIndex.scale(dpr, dpr);
+    this.ctxIndex.clearRect(0, 0, 50, viewHeight);
+
+    const startRow = Math.floor(scrollTop / this.cellHeight);
+    const endRow = Math.min(
+      this.totalRows,
+      startRow + Math.ceil(viewHeight / this.cellHeight) + 1
+    );
+
+    this.ctxIndex.font = "12px Arial";
+    this.ctxIndex.textAlign = "center";
+    this.ctxIndex.textBaseline = "middle";
+    this.ctxIndex.fillStyle = "#111";
+
+    for (let i = startRow; i < endRow; i++) {
+      const y = i * this.cellHeight - scrollTop;
+      this.ctxIndex.fillText(i + 1, 25, y + this.cellHeight / 2);
+    }
+
+    this.ctxIndex.beginPath();
+    for (let i = startRow; i <= endRow; i++) {
+      const y = i * this.cellHeight - scrollTop + 0.5;
+      this.ctxIndex.moveTo(0, y);
+      this.ctxIndex.lineTo(100, y);
+    }
+
+    this.ctxIndex.strokeStyle = "#ccc";
+    this.ctxIndex.lineWidth = 1;
+    this.ctxIndex.stroke();
+    this.ctxIndex.restore();
+  }
+
+  _getColumnLabel(index) {
+    let label = "";
+    while (index >= 0) {
+      label = String.fromCharCode((index % 26) + 65) + label;
+      index = Math.floor(index / 26) - 1;
+    }
+    return label;
   }
 }
