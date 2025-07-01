@@ -75,3 +75,11 @@ Match the look and feel of the excel grid. Carefully look at the line thickness.
 26 | 06 | 2025:
 - Implement render on scroll
 - Implement 1 lakh rows and 500 columns
+
+| Step | Description                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------------ |
+| 01   | Basic grid rendering on a canvas                                                                 |
+| 02   | Scrollable grid with `canvasContainer`                                                           |
+| 03   | Dynamic rendering of visible cells only                                                          |
+| 04   | Fixed headers (`A`, `B`, `C`...) and row indexes (`1`, `2`, `3`...)                              |
+| 05   | Styled cell rendering with a data model (`setCellData`, `getCellData`) and clean rendering logic |

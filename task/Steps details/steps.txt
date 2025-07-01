@@ -1,116 +1,165 @@
-Absolutely, Vrutikkk — those are excellent additions and will give your Excel clone a **true spreadsheet-like UX**. Here's a **clear, sequential roadmap** with all major features grouped in logical steps.
+Absolutely, Vrutikkk! Here's a complete **recap of what’s done** till **Step 05**, followed by a breakdown of **what's coming next** and the **final feature roadmap** of your Excel clone project.
 
 ---
 
-## ✅ What’s Done So Far (Step 01–03)
+## ✅ **Progress Recap Till Step 05**
 
-* Canvas rendering engine
-* Virtual scrolling with performance
-* DPR scaling (sharp lines)
-* Viewport-aligned rendering logic
+### ✅ Step 01: Project Setup
 
----
+* Created base HTML and CSS layout.
+* Defined three separate canvas layers:
 
-## 🔜 **Next Steps (Step 04 onward)**
-
-### 🧩 **STEP 04: Row & Column Headers (Fixed UI)**
-
-* Display row numbers (1, 2, 3...) on left
-* Display column names (A, B, C...) on top
-* Keep them sticky while scrolling
-* Use `<div>` or `<canvas>` for headers (your call)
+  * `excelCanvas` (main grid),
+  * `headerCanvas` (top column headers),
+  * `indexCanvas` (left row indexes).
+* Proper scrollable container with `canvas-wrapper`.
 
 ---
 
-### 🧱 **STEP 05: Cell Selection**
+### ✅ Step 02: Grid Rendering Logic
 
-* Click to select a single cell
-* Highlight border
-* Support arrow key navigation
-* Update selected cell state
-
----
-
-### 🔧 **STEP 06: Cell Editing**
-
-* Double-click to edit
-* Render input box over canvas (absolutely positioned)
-* On blur or Enter, update data model and re-render
+* Implemented `Grid` class.
+* Calculated visible cell ranges using scroll position.
+* Dynamically rendered horizontal and vertical lines (grid).
+* Added pixel-perfect precision using `0.5` line offset.
 
 ---
 
-### 📐 **STEP 07: Column & Row Resizing**
+### ✅ Step 03: Device Pixel Ratio (DPR) Handling
 
-* On hover near cell edge → show resize cursor
-* On drag → dynamically resize width/height
-* Update internal arrays + re-render
-
----
-
-### 🔢 **STEP 08: Load Data (JSON)**
-
-* Generate 50,000 sample rows
-* Display them inside the grid
-* Support typed values (number, string)
+* Scaled canvas drawing using `devicePixelRatio` for sharp lines on high-DPI displays.
+* Added a general `_setupCanvas` method to avoid repetition.
 
 ---
 
-### 🔍 **STEP 09: Selection Enhancements**
+### ✅ Step 04: Fixed Headers & Indexes
 
-* Shift+Click = range selection
-* Drag selection via mouse
-* Support selection rectangles
-
----
-
-### 📊 **STEP 10: Aggregation Panel**
-
-* On selecting numeric cells:
-
-  * Show count, sum, average, min, max
-* Fixed footer panel (or floating)
+* Rendered column headers (`A`, `B`, `C`...) and row indexes (`1`, `2`, `3`...) on their respective canvases.
+* Synced scrolling so they stay fixed during vertical/horizontal scrolling.
+* Top-left corner border and canvas alignment issues were resolved.
+* Used `z-index` and canvas `position` correctly to avoid overlapping with scrollbars.
 
 ---
 
-### ♻️ **STEP 11: Undo / Redo System**
+### ✅ Step 05: Data Model Integration (Split into 3 Parts)
 
-* Implement Command Pattern
-* Support for:
+* **Part 1:** Added internal `this.data` model using `{ "row:col": { value, style } }` format.
+* **Part 2:** Rendered cell values on main canvas with support for bold/italic text.
+* **Part 3:** Refactored full code:
 
-  * Cell edits
-  * Resizing
-  * Insert/Delete
-* `undo()`, `redo()` via buttons or hotkeys
-
----
-
-### ➕ **STEP 12: Insert/Delete Rows/Columns**
-
-* Right-click (or button)
-
-  * Insert row above/below
-  * Delete row
-  * Insert column left/right
-  * Delete column
-* Adjust internal model + re-render
+  * Separated styling logic in `_cellStyle`.
+  * Avoided duplicated `setTransform`, `scale`, etc.
+  * Consolidated repeated code into `_setupCanvas`.
+  * Applied precise DPR-aware strokes (`1 / dpr`).
+  * Moved fixed top/left borders from header/index canvas to `excelCanvas`.
 
 ---
 
-### 🎨 **STEP 13: UI Panel for Actions**
+## 🔮 What's Coming Next
 
-* Mini toolbar (Insert, Delete, Format)
-* Visible above grid
-* You can float it, fix it, or dock it
+### 🟦 Step 06: **Cell Selection**
 
----
+> We'll implement mouse-based and keyboard-based cell selection.
 
-## 🚀 Bonus (Optional Final Touches)
-
-* Copy/Paste
-* Keyboard nav
-* Export to CSV
-* Frozen panes (like Excel)
+* Clicking a cell highlights it.
+* Arrow key navigation.
+* Selecting ranges (Shift + click or drag).
+* Rendering selection box.
+* Syncing selection with headers and indexes for better UX.
 
 ---
 
-Let me know when you're ready to move to **STEP 04: Fixed headers (row + column)**, and I’ll give you the **Part 1 Task + Implementation Guide** exactly as we planned earlier.
+### 🟦 Step 07: **Cell Editing**
+
+> Double click or `Enter` key enables in-place cell editing.
+
+* Floating input box appears on top of the selected cell.
+* On `Enter`, value is committed to the grid data model.
+* Escape to cancel editing.
+
+---
+
+### 🟦 Step 08: **Multiple Selection & Range Highlight**
+
+* Select multiple rows/columns.
+* Mouse drag selection for a rectangular group of cells.
+* Highlight the selected block visually.
+
+---
+
+### 🟦 Step 09: **Insert/Delete Row & Column**
+
+> Excel-like UI buttons or right-click menu to:
+
+* Insert row above/below.
+* Delete row.
+* Insert column left/right.
+* Delete column.
+
+---
+
+### 🟦 Step 10: **Styling Features**
+
+> Add support for:
+
+* Bold, Italic, Underline toggles.
+* Font size, color changes.
+* Background cell color.
+* Apply style to selected cell(s).
+
+---
+
+### 🟦 Step 11: **Formula Support**
+
+> Basic formula parsing:
+
+* Start with `=` support for basic formulas like `=A1+B2`.
+* Parse cell references and evaluate.
+* Show computed result in the cell.
+
+---
+
+### 🟦 Step 12: **Context Menu / Toolbar**
+
+* Right-click options for formatting/editing.
+* Top/bottom toolbar for cell actions.
+* Excel-style quick-access UI.
+
+---
+
+### 🟦 Step 13: **Saving and Loading**
+
+* Download/upload `.json` files of the current sheet.
+* Export to `.csv`.
+
+---
+
+### 🟦 Step 14: **Multiple Sheet Support**
+
+* Add tab-based sheet navigation.
+* Maintain data for each sheet separately.
+
+---
+
+## 📋 Features You Mentioned (Project Requirement Summary)
+
+Here's what you mentioned you want in your full project, all of which are now in our roadmap:
+
+| Feature                      | Status            |
+| ---------------------------- | ----------------- |
+| Grid rendering               | ✅ Done            |
+| Cell value rendering         | ✅ Done            |
+| Header & Index canvas        | ✅ Done            |
+| Precise DPR handling         | ✅ Done            |
+| Selection handling           | 🔜 Coming Next    |
+| Cell editing                 | 🔜 Planned        |
+| Styling (bold, italic, etc.) | 🔜 Planned        |
+| Insert/Delete row/column     | 🔜 Planned        |
+| Column/row resizing          | 🔜 Optional Extra |
+| Basic formula support        | 🔜 Planned        |
+| File save/load               | 🔜 Planned        |
+| Multiple sheets              | 🔜 Optional Extra |
+
+---
+
+Let me know when you're ready — and we’ll **move to Step 06: Cell Selection** in the next message.

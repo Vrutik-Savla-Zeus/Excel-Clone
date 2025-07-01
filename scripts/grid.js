@@ -254,12 +254,12 @@ export class Grid {
     const startCol = Math.floor(scrollLeft / this.cellWidth);
     const endCol = Math.min(
       this.totalColumns,
-      startCol + Math.ceil(viewWidth / this.cellWidth) + 1
+      Math.ceil((scrollLeft + viewWidth) / this.cellWidth)
     );
     const startRow = Math.floor(scrollTop / this.cellHeight);
     const endRow = Math.min(
       this.totalRows,
-      startRow + Math.ceil(viewHeight / this.cellHeight) + 1
+      Math.ceil((scrollTop + viewHeight) / this.cellHeight)
     );
 
     return {
