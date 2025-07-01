@@ -97,15 +97,20 @@ export class Grid {
       this.ctx.moveTo(x, startRow * this.cellHeight);
       this.ctx.lineTo(x, endRow * this.cellHeight);
     }
-    this.ctx.moveTo(scrollLeft + 0.5 / dpr, 0);
-    this.ctx.lineTo(scrollLeft + 0.5 / dpr, viewHeight);
-    this.ctx.moveTo(0, scrollTop + 0.5 / dpr);
-    this.ctx.lineTo(viewWidth, scrollTop + 0.5 / dpr);
-
     this.ctx.strokeStyle = "#ccc";
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
     this.ctx.restore();
+
+    // Fixed strokes: top and left border of viewport
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, 0); // Top horizontal
+    this.ctx.lineTo(viewWidth, 0);
+    this.ctx.moveTo(0, 0); // Left vertical
+    this.ctx.lineTo(0, viewHeight);
+    this.ctx.strokeStyle = "#ccc";
+    this.ctx.lineWidth = 1 / dpr;
+    this.ctx.stroke();
 
     // Cell Values
     for (let row = startRow; row < endRow; row++) {
