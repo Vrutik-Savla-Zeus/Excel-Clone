@@ -13,18 +13,29 @@
 
 .canvas-wrapper {
   position: relative;
+  cursor: cell;
 
   /* will be set in JS */
   /* width: 50000px; */
   /* height: 2500000px; */
 }
 
+.top-left-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 25px;
+  z-index: -10;
+  background-color: #f3f3f3;
+}
+
 .excel-canvas {
-  position: sticky;
+  position: fixed;
   top: 25px;
   left: 50px;
 
-  z-index: 10;
+  z-index: -10;
   background-color: transparent;
 }
 
@@ -44,4 +55,19 @@
 
   z-index: -10;
   background-color: transparent;
+}
+
+/* SCROLL BARS */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ccc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 20px;
 }

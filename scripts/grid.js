@@ -11,6 +11,8 @@ export class Grid {
    * @param {CanvasRenderingContext2D} ctxHeader Canvas 2d rendering context.
    * @param {HTMLCanvasElement} canvasIndex -Canvas element to render on.
    * @param {CanvasRenderingContext2D} ctxIndex Canvas 2d rendering context.
+   * @param {HTMLCanvasElement} canvasTopLeft -Canvas element to render on.
+   * @param {CanvasRenderingContext2D} ctxTopLeft Canvas 2d rendering context.
    * @param {number} totalRows - Total number of rows.
    * @param {number} totalColumns - Total number of columns.
    * @param {number} cellWidth - Width of each cell.
@@ -24,6 +26,8 @@ export class Grid {
     ctxHeader,
     canvasIndex,
     ctxIndex,
+    canvasTopLeft,
+    ctxTopLeft,
     totalRows,
     totalColumns,
     cellWidth,
@@ -44,6 +48,10 @@ export class Grid {
     this.canvasIndex = canvasIndex;
     /** @type {CanvasRenderingContext2D} */
     this.ctxIndex = ctxIndex;
+    /** @type {HTMLCanvasElement} */
+    this.canvasTopLeft = canvasTopLeft;
+    /** @type {CanvasRenderingContext2D} */
+    this.ctxTopLeft = ctxTopLeft;
 
     /** @type {number} */
     this.totalRows = totalRows;
@@ -62,6 +70,8 @@ export class Grid {
     this.data = {};
 
     this._init();
+
+    console.log(canvasTopLeft, ctxTopLeft);
   }
 
   /**
@@ -103,11 +113,13 @@ export class Grid {
     this.ctx.restore();
 
     // Fixed strokes: top and left border of viewport
+    const maxX = this.totalColumns * this.cellWidth;
+    const maxY = this.totalRows * this.cellHeight;
     this.ctx.beginPath();
-    this.ctx.moveTo(0, 0); // Top horizontal
-    this.ctx.lineTo(viewWidth, 0);
-    this.ctx.moveTo(0, 0); // Left vertical
-    this.ctx.lineTo(0, viewHeight);
+    this.ctx.moveTo(0, 0);
+    this.ctx.lineTo(Math.min(viewWidth, maxX), 0);
+    this.ctx.moveTo(0, 0);
+    this.ctx.lineTo(0, Math.min(viewHeight, maxY));
     this.ctx.strokeStyle = "#ccc";
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
@@ -146,9 +158,14 @@ export class Grid {
       viewWidth,
       this.cellHeight
     );
-    this._cellStyle(this.ctxHeader, 12, "Arial", "center", "middle", "#111");
+
+    // Header Color
+    this.ctxHeader.fillStyle = "#f3f3f3"; // light grey
+    const visibleColsWidth = (endCol - startCol) * this.cellWidth;
+    this.ctxHeader.fillRect(0, 0, visibleColsWidth, this.cellHeight);
 
     // Labels
+    this._cellStyle(this.ctxHeader, 12, "Arial", "center", "middle", "#111");
     for (let j = startCol; j < endCol; j++) {
       const x = j * this.cellWidth - scrollLeft;
       const label = this._getColumnLabel(j);
@@ -162,6 +179,7 @@ export class Grid {
     // Strokes
     this.ctxHeader.save();
     this.ctxHeader.beginPath();
+
     for (let j = startCol; j <= endCol; j++) {
       const x = j * this.cellWidth - scrollLeft + 0.5 / dpr;
       this.ctxHeader.moveTo(x, 0);
@@ -184,9 +202,14 @@ export class Grid {
     const indexWidth = 50;
     const { scrollTop, viewHeight, startRow, endRow } = this._getVisibleRange();
     this._setupCanvas(this.ctxIndex, this.canvasIndex, indexWidth, viewHeight);
-    this._cellStyle(this.ctxIndex, 12, "Arial", "center", "middle", "#111");
+
+    // Index color
+    this.ctxIndex.fillStyle = "#f3f3f3"; // light grey
+    const visibleRowsHeight = (endRow - startRow) * this.cellHeight;
+    this.ctxIndex.fillRect(0, 0, indexWidth, visibleRowsHeight);
 
     // Labels
+    this._cellStyle(this.ctxIndex, 12, "Arial", "center", "middle", "#111");
     for (let i = startRow; i < endRow; i++) {
       const y = i * this.cellHeight - scrollTop;
       this.ctxIndex.fillText(i + 1, indexWidth / 2, y + this.cellHeight / 2);
@@ -226,13 +249,38 @@ export class Grid {
   }
 
   /**
+   * Renders Top Left corner of grid
+   */
+  renderTopLeft() {
+    const dpr = window.devicePixelRatio || 1;
+    const width = 50;
+    const height = 25;
+
+    this._setupCanvas(this.ctxTopLeft, this.canvasTopLeft, width, height);
+    this.ctxTopLeft.fillStyle = "#f3f3f3";
+    this.ctxTopLeft.fillRect(0, 0, width, height);
+
+    this.ctxTopLeft.beginPath();
+    this.ctxTopLeft.moveTo(15, 8);
+    this.ctxTopLeft.lineTo(35, 8);
+    this.ctxTopLeft.lineTo(25, 18);
+    this.ctxTopLeft.closePath();
+    this.ctxTopLeft.fillStyle = "#888";
+    this.ctxTopLeft.fill();
+  }
+
+  /**
    * Initialises grid wrapper & rows / column array
    */
   _init() {
     // Set full grid size on wrapper div
     const wrapper = document.getElementById("canvasWrapper");
-    wrapper.style.width = `${this.totalColumns * this.cellWidth}px`;
-    wrapper.style.height = `${this.totalRows * this.cellHeight}px`;
+    wrapper.style.width = `${
+      this.totalColumns * this.cellWidth + this.cellWidth / 2
+    }px`;
+    wrapper.style.height = `${
+      this.totalRows * this.cellHeight + this.cellHeight
+    }px`;
 
     for (let i = 0; i < this.totalRows; i++) {
       this.rows.push(new Row(i, this.cellHeight));
@@ -248,19 +296,27 @@ export class Grid {
   _getVisibleRange() {
     const scrollLeft = this.canvasContainer.scrollLeft;
     const scrollTop = this.canvasContainer.scrollTop;
-    const viewWidth = this.canvasContainer.clientWidth;
-    const viewHeight = this.canvasContainer.clientHeight;
+    const viewWidth = this.canvasContainer.clientWidth + 1;
+    const viewHeight = this.canvasContainer.clientHeight + 1;
 
     const startCol = Math.floor(scrollLeft / this.cellWidth);
+
     const endCol = Math.min(
       this.totalColumns,
-      Math.ceil((scrollLeft + viewWidth) / this.cellWidth)
-    );
+      startCol + Math.ceil(viewWidth / this.cellWidth) + 1
+    ); // const endCol = Math.min(
+    //   this.totalColumns,
+    //   Math.ceil((scrollLeft + viewWidth) / this.cellWidth)
+    // );
     const startRow = Math.floor(scrollTop / this.cellHeight);
     const endRow = Math.min(
       this.totalRows,
-      Math.ceil((scrollTop + viewHeight) / this.cellHeight)
+      startRow + Math.ceil(viewHeight / this.cellHeight) + 1
     );
+    // const endRow = Math.min(
+    //   this.totalRows,
+    //   Math.ceil((scrollTop + viewHeight) / this.cellHeight)
+    // );
 
     return {
       scrollLeft,
@@ -278,6 +334,7 @@ export class Grid {
    * Helper to set up canvas size, DPR scaling, and clear
    */
   _setupCanvas(ctx, canvas, width, height) {
+    console.log(ctx, canvas, width, height);
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
