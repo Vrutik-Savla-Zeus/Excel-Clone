@@ -59,6 +59,8 @@ export class Grid {
     /** @type {Column[]} */
     this.cols = [];
 
+    this.data = {};
+
     this._init();
   }
 
@@ -66,6 +68,7 @@ export class Grid {
    * Renders cell grid
    */
   renderCells() {
+    const dpr = window.devicePixelRatio || 1;
     const {
       scrollLeft,
       scrollTop,
@@ -84,28 +87,53 @@ export class Grid {
 
     // Horizontal lines
     for (let i = startRow; i <= endRow; i++) {
-      const y = i * this.cellHeight + 0.5;
+      const y = i * this.cellHeight + 0.5 / dpr;
       this.ctx.moveTo(startCol * this.cellWidth, y);
       this.ctx.lineTo(endCol * this.cellWidth, y);
     }
-
     // Vertical lines
     for (let j = startCol; j <= endCol; j++) {
-      const x = j * this.cellWidth + 0.5;
+      const x = j * this.cellWidth + 0.5 / dpr;
       this.ctx.moveTo(x, startRow * this.cellHeight);
       this.ctx.lineTo(x, endRow * this.cellHeight);
     }
+    this.ctx.moveTo(scrollLeft + 0.5 / dpr, 0);
+    this.ctx.lineTo(scrollLeft + 0.5 / dpr, viewHeight);
+    this.ctx.moveTo(0, scrollTop + 0.5 / dpr);
+    this.ctx.lineTo(viewWidth, scrollTop + 0.5 / dpr);
 
     this.ctx.strokeStyle = "#ccc";
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
     this.ctx.restore();
+
+    // Cell Values
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
+        const key = `${row}:${col}`;
+        const cell = this.data[key];
+        if (cell) {
+          this._cellStyle(this.ctx, 12, "Arial", "left", "middle", "#111");
+          const { value, bold, italic } = this.data[key];
+
+          let fontStyle = "";
+          if (italic) fontStyle += "italic ";
+          if (bold) fontStyle += "bold ";
+          this.ctx.font = `${fontStyle}14px Arial`;
+
+          const x = col * this.cellWidth - scrollLeft + 5;
+          const y = row * this.cellHeight - scrollTop + this.cellHeight / 2 + 5;
+          this.ctx.fillText(value, x, y);
+        }
+      }
+    }
   }
 
   /**
    * Renders column headers
    */
   renderHeader() {
+    const dpr = window.devicePixelRatio || 1;
     const { scrollLeft, viewWidth, startCol, endCol } = this._getVisibleRange();
     this._setupCanvas(
       this.ctxHeader,
@@ -113,7 +141,7 @@ export class Grid {
       viewWidth,
       this.cellHeight
     );
-    this._headerStyle(this.ctxHeader);
+    this._cellStyle(this.ctxHeader, 12, "Arial", "center", "middle", "#111");
 
     // Labels
     for (let j = startCol; j < endCol; j++) {
@@ -130,12 +158,15 @@ export class Grid {
     this.ctxHeader.save();
     this.ctxHeader.beginPath();
     for (let j = startCol; j <= endCol; j++) {
-      const x = j * this.cellWidth - scrollLeft + 0.5;
+      const x = j * this.cellWidth - scrollLeft + 0.5 / dpr;
       this.ctxHeader.moveTo(x, 0);
       this.ctxHeader.lineTo(x, this.cellHeight);
     }
+    this.ctxHeader.moveTo(0, 0);
+    this.ctxHeader.lineTo(0, this.cellHeight);
+
     this.ctxHeader.strokeStyle = "#ccc";
-    this.ctxHeader.lineWidth = 1;
+    this.ctxHeader.lineWidth = 1 / dpr;
     this.ctxHeader.stroke();
     this.ctxHeader.restore();
   }
@@ -144,10 +175,11 @@ export class Grid {
    * Renders row indexes
    */
   renderIndex() {
-    const { scrollTop, viewHeight, startRow, endRow } = this._getVisibleRange();
+    const dpr = window.devicePixelRatio || 1;
     const indexWidth = 50;
+    const { scrollTop, viewHeight, startRow, endRow } = this._getVisibleRange();
     this._setupCanvas(this.ctxIndex, this.canvasIndex, indexWidth, viewHeight);
-    this._headerStyle(this.ctxIndex);
+    this._cellStyle(this.ctxIndex, 12, "Arial", "center", "middle", "#111");
 
     // Labels
     for (let i = startRow; i < endRow; i++) {
@@ -159,14 +191,33 @@ export class Grid {
     this.ctxIndex.save();
     this.ctxIndex.beginPath();
     for (let i = startRow; i <= endRow; i++) {
-      const y = i * this.cellHeight - scrollTop + 0.5;
+      const y = i * this.cellHeight - scrollTop + 0.5 / dpr;
       this.ctxIndex.moveTo(0, y);
       this.ctxIndex.lineTo(indexWidth, y);
     }
+
+    this.ctxIndex.moveTo(0, 0);
+    this.ctxIndex.lineTo(indexWidth, 0);
+
     this.ctxIndex.strokeStyle = "#ccc";
-    this.ctxIndex.lineWidth = 1;
+    this.ctxIndex.lineWidth = 1 / dpr;
     this.ctxIndex.stroke();
     this.ctxIndex.restore();
+  }
+
+  /**
+   * Sets cell data in this.data
+   */
+  setCellData(row, col, value, style = {}) {
+    const key = `${row}:${col}`;
+    this.data[key] = { value, ...style };
+  }
+
+  /**
+   * Gets cell data from this.data with respect to row and column
+   */
+  getCellData(row, col) {
+    return this.data[`${row}:${col}`] || null;
   }
 
   /**
@@ -235,11 +286,11 @@ export class Grid {
   /**
    * Sets styling for column headers & row indexes
    */
-  _headerStyle(ctx) {
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#111";
+  _cellStyle(ctx, fontSize, fontFamily, textAlign, textBaseline, color) {
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.textAlign = textAlign;
+    ctx.textBaseline = textBaseline;
+    ctx.fillStyle = color;
   }
 
   /**

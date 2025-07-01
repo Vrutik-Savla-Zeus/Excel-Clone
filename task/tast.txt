@@ -4,7 +4,6 @@ Coding guidelines
 1. Make sure you have comments over every function and every class variable you use
  
 For example
- 
 class Person {
  
     /**
@@ -29,6 +28,8 @@ Features to implement
 ---------------------
 Use html canvas to great this excel grid.
  
+
+FEATURES:
 1. Support 1 lakh rows and 500 columns
 2. Column resizing should be supported
 3. Row resizing should be supported
@@ -51,6 +52,11 @@ Use html canvas to great this excel grid.
 10. Insert column & insert rows
 11. select rows and columns through mouse and keyboard
  
+
+
+
+
+
 Please make sure we create separate classes for 
 1. grid
 2. Try and create a separate class for each action that you perform.

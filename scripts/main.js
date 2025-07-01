@@ -29,11 +29,11 @@ const grid = new Grid(
   CELL_HEIGHT
 );
 
-function renderGrid() {
-  grid.renderCells();
-  grid.renderHeader();
-  grid.renderIndex();
-}
+// TEST DATA ENTRY
+grid.setCellData(10, 3, "HELLO");
+grid.setCellData(1, 5, "123", { bold: true, italic: true });
+grid.setCellData(5, 2, "Vrutik", { italic: true });
+grid.setCellData(15, 8, "Savla", { bold: true });
 
 // Initial rendering of cells
 renderGrid();
@@ -45,3 +45,12 @@ canvasContainer.addEventListener("scroll", (e) => {
 window.addEventListener("resize", (e) => {
   renderGrid(); // Re-render cells on window resize to set DPR
 });
+
+/**
+ * Handles rendering of whole excel grid
+ */
+function renderGrid() {
+  grid.renderCells();
+  grid.renderHeader();
+  grid.renderIndex();
+}

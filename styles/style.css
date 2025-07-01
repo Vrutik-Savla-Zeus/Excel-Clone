@@ -34,8 +34,8 @@
   z-index: 10;
   background-color: transparent;
 
-  border-top: 0.5px solid #ccc;
-  border-left: 0.5px solid #ccc;
+  /* border-top: 0.5px solid #ccc;
+  border-left: 0.5px solid #ccc; */
 }
 
 .header-canvas {
@@ -48,7 +48,7 @@
 
   z-index: -10;
   background-color: transparent;
-  border-left: 0.5px solid #ccc;
+  /* border-left: 0.5px solid #ccc; */
 }
 
 .index-canvas {
@@ -61,5 +61,5 @@
 
   z-index: -10;
   background-color: transparent;
-  border-top: 0.5px solid #ccc;
+  /* border-top: 0.5px solid #ccc; */
 }
