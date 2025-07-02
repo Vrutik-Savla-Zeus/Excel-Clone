@@ -7,9 +7,19 @@ export class SelectionManager {
     /** @type {grid} */
     this.grid = grid;
 
+    /** @type {Object} */
     this.selectedCell = null;
   }
 
+  /**
+   * Renders cell selection
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2d context
+   * @param {Number} scrollLeft
+   * @param {Number} scrollTop
+   * @param {Number} cellWidth
+   * @param {Number} cellHeight
+   * @returns null
+   */
   renderSelection(ctx, scrollLeft, scrollTop, cellWidth, cellHeight) {
     if (!this.selectedCell) return;
 
@@ -28,6 +38,8 @@ export class SelectionManager {
 
   /**
    * Sets selected cell to seleted object
+   * @param {Number} row - Row index
+   * @param {Number} col- Column header
    */
   setSelectedCell(row, col) {
     this.selectedCell = { row, col };
@@ -36,6 +48,7 @@ export class SelectionManager {
 
   /**
    * Gets selected cell
+   * @returns Object with row and col
    */
   getSelectedCell() {
     return this.selectedCell;

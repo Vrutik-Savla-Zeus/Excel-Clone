@@ -1,13 +1,13 @@
 export class Column {
   /**
    * Represents a single column in the grid
-   * @param {number} index - Column index.
-   * @param {number} width - Width of the column
+   * @param {Number} index - Column index.
+   * @param {Number} width - Width of the column
    */
   constructor(index, width) {
-    /**@type {number} */
+    /**@type {Number} */
     this.index = index;
-    /**@type {number} */
+    /**@type {Number} */
     this.width = width;
   }
 }

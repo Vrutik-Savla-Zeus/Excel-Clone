@@ -14,10 +14,10 @@ export class Grid {
    * @param {CanvasRenderingContext2D} ctxIndex Canvas 2d rendering context.
    * @param {HTMLCanvasElement} canvasTopLeft -Canvas element to render on.
    * @param {CanvasRenderingContext2D} ctxTopLeft Canvas 2d rendering context.
-   * @param {number} totalRows - Total number of rows.
-   * @param {number} totalColumns - Total number of columns.
-   * @param {number} cellWidth - Width of each cell.
-   * @param {number} cellHeight - Height of each cell.
+   * @param {Number} totalRows - Total number of rows.
+   * @param {Number} totalColumns - Total number of columns.
+   * @param {Number} cellWidth - Width of each cell.
+   * @param {Number} cellHeight - Height of each cell.
    */
   constructor(
     canvasContainer,
@@ -54,13 +54,13 @@ export class Grid {
     /** @type {CanvasRenderingContext2D} */
     this.ctxTopLeft = ctxTopLeft;
 
-    /** @type {number} */
+    /** @type {Number} */
     this.totalRows = totalRows;
-    /** @type {number} */
+    /** @type {Number} */
     this.totalColumns = totalColumns;
-    /** @type {number} */
+    /** @type {Number} */
     this.cellWidth = cellWidth;
-    /** @type {number} */
+    /** @type {Number} */
     this.cellHeight = cellHeight;
 
     /** @type {Row[]} */
@@ -68,23 +68,30 @@ export class Grid {
     /** @type {Column[]} */
     this.cols = [];
 
+    /** @type {Object} */
     this.data = {};
 
+    /** @type {SelectionManager} */
     this.selectionManager = new SelectionManager(this);
 
+    /** @type {function} */
     this._init();
   }
 
   // METHODS
+  /**
+   * Renders whole excel grid with data
+   */
   render() {
     this.renderCells();
     this.renderHeader();
     this.renderIndex();
     this.renderCellData();
+    this.renderTopLeft();
   }
 
   /**
-   * Renders cell grid
+   * Render cells
    */
   renderCells() {
     const dpr = window.devicePixelRatio || 1;
@@ -133,6 +140,7 @@ export class Grid {
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
 
+    // Cell selection
     this.selectionManager.renderSelection(
       this.ctx,
       scrollLeft,
@@ -155,12 +163,12 @@ export class Grid {
       this.cellHeight
     );
 
-    // Header Color
+    // Header background color
     this.ctxHeader.fillStyle = "#f3f3f3"; // light grey
     const visibleColsWidth = (endCol - startCol) * this.cellWidth;
     this.ctxHeader.fillRect(0, 0, visibleColsWidth, this.cellHeight);
 
-    // Labels
+    // Header labels
     this._cellStyle(this.ctxHeader, 12, "Arial", "center", "middle", "#111");
     for (let j = startCol; j < endCol; j++) {
       const x = j * this.cellWidth - scrollLeft;
@@ -172,7 +180,7 @@ export class Grid {
       );
     }
 
-    // Strokes
+    // Header strokes
     this.ctxHeader.save();
     this.ctxHeader.beginPath();
 
@@ -204,22 +212,22 @@ export class Grid {
     const visibleRowsHeight = (endRow - startRow) * this.cellHeight;
     this.ctxIndex.fillRect(0, 0, indexWidth, visibleRowsHeight);
 
-    // Labels
+    // Index labels
     this._cellStyle(this.ctxIndex, 12, "Arial", "center", "middle", "#111");
     for (let i = startRow; i < endRow; i++) {
       const y = i * this.cellHeight - scrollTop;
       this.ctxIndex.fillText(i + 1, indexWidth / 2, y + this.cellHeight / 2);
     }
 
-    // Strokes
+    // Index strokes
     this.ctxIndex.save();
     this.ctxIndex.beginPath();
+
     for (let i = startRow; i <= endRow; i++) {
       const y = i * this.cellHeight - scrollTop + 0.5 / dpr;
       this.ctxIndex.moveTo(0, y);
       this.ctxIndex.lineTo(indexWidth, y);
     }
-
     this.ctxIndex.moveTo(0, 0);
     this.ctxIndex.lineTo(indexWidth, 0);
 
@@ -233,7 +241,6 @@ export class Grid {
    * Renders Top Left corner of grid
    */
   renderTopLeft() {
-    const dpr = window.devicePixelRatio || 1;
     const width = 50;
     const height = 25;
 
@@ -251,7 +258,11 @@ export class Grid {
   }
 
   /**
-   * Sets cell data in this.data
+   * Sets cell data with row & column details
+   * @param {Number} row - Row Index
+   * @param {Number} col - Column Header
+   * @param {any} value - Data of cell
+   * @param {Object} style - Bold or Italic
    */
   setCellData(row, col, value, style = {}) {
     const key = `${row}:${col}`;
@@ -260,6 +271,9 @@ export class Grid {
 
   /**
    * Gets cell data from this.data with respect to row and column
+   * @param {Number} row - Row Index
+   * @param {Number} col - Column Header
+   * @returns Cell data or null
    */
   getCellData(row, col) {
     return this.data[`${row}:${col}`] || null;
@@ -329,6 +343,10 @@ export class Grid {
 
   /**
    * Helper to set up canvas size, DPR scaling, and clear
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2d rendering context
+   * @param {HTMLCanvasElement} canvas - Canvas element
+   * @param {Number} width - Width of canvas
+   * @param {Number} height -Height of canvas
    */
   _setupCanvas(ctx, canvas, width, height) {
     const dpr = window.devicePixelRatio || 1;
@@ -371,6 +389,12 @@ export class Grid {
 
   /**
    * Sets styling for column headers & row indexes
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2d rendering context
+   * @param {Number} fontSize - Size of text inside cell
+   * @param {String} fontFamily - Font family of text inside cell
+   * @param {String} textAlign - Alignment of text inside cell
+   * @param {String} textBaseline - Baseline of text inside cell
+   * @param {String} color - Color of text inside cell
    */
   _cellStyle(ctx, fontSize, fontFamily, textAlign, textBaseline, color) {
     ctx.font = `${fontSize}px ${fontFamily}`;
@@ -381,6 +405,8 @@ export class Grid {
 
   /**
    * Takes index and gives column label (character)
+   * @param {Number} index - Associated character with number
+   * @returns Character
    */
   _getColumnLabel(index) {
     let label = "";

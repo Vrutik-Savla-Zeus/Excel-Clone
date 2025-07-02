@@ -10,13 +10,13 @@ class Person {
     * Intializes the Person object
     *@param {String} firstName FirstName of the person
     *@param {String} lastName Last Name of the person
-    *@param {number} age The age of the person
+    *@param {Number} age The age of the person
     **/
     constructor(firstName, lastName, age)
     {
-         /**@type {string} Stores the firstName of the person*/
+         /**@type {String} Stores the firstName of the person*/
         this.firstName = firstName;
-        /**@type {number} Stores the age of the person*/
+        /**@type {Number} Stores the age of the person*/
         this.age = age;
     }
 

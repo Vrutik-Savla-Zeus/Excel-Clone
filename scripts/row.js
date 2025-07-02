@@ -1,13 +1,13 @@
 export class Row {
   /**
    * Represents a single row in the grid
-   * @param {number} index - Row index.
-   * @param {number} height - Height of the row.
+   * @param {Number} index - Row index.
+   * @param {Number} height - Height of the row.
    */
   constructor(index, height) {
-    /**@type {number} */
+    /**@type {Number} */
     this.index = index;
-    /**@type {number} */
+    /**@type {Number} */
     this.height = height;
   }
 }

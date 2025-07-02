@@ -1,6 +1,7 @@
 import { Grid } from "./grid.js";
 import { SelectionManager } from "./selectionManager.js";
 
+// GLOBAL DECLARATIONS
 // const TOTAL_ROWS = 25;
 // const TOTAL_COLUMNS = 7;
 const TOTAL_ROWS = 100000;
@@ -8,6 +9,7 @@ const TOTAL_COLUMNS = 500;
 const CELL_WIDTH = 100;
 const CELL_HEIGHT = 25;
 
+// SELECTING HTML ELEMENTS
 const canvasContainer = document.getElementById("canvasContainer");
 const canvas = document.getElementById("excelCanvas");
 const ctx = canvas.getContext("2d");
@@ -21,6 +23,7 @@ const ctxIndex = canvasIndex.getContext("2d");
 const canvasTopLeft = document.getElementById("topLeftCanvas");
 const ctxTopLeft = canvasTopLeft.getContext("2d");
 
+// GRID RENDERING
 const grid = new Grid(
   canvasContainer,
   canvas,
@@ -36,11 +39,8 @@ const grid = new Grid(
   CELL_WIDTH,
   CELL_HEIGHT
 );
-
-// GRID RENDERING
 testData();
 grid.render();
-grid.renderTopLeft();
 canvasContainer.addEventListener(
   "scroll",
   // Re-render cells on scroll event
@@ -52,7 +52,7 @@ window.addEventListener(
   (e) => requestAnimationFrame(grid.render())
 );
 
-// Cell Selection
+// CELL SELECTION
 canvasContainer.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left + canvasContainer.scrollLeft;
