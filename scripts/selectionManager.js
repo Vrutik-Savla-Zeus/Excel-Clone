@@ -33,6 +33,7 @@ export class SelectionManager {
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
     ctx.strokeRect(x + 1, y + 1, cellWidth - 1, cellHeight - 1);
+    console.log(x + 1, y + 1, cellWidth - 1, cellHeight - 1);
     ctx.restore();
   }
 

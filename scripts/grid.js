@@ -258,6 +258,35 @@ export class Grid {
   }
 
   /**
+   * Renders cell data
+   */
+  renderCellData() {
+    const { scrollLeft, scrollTop, startCol, endCol, startRow, endRow } =
+      this._getVisibleRange();
+
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
+        const key = `${row}:${col}`;
+        const cell = this.data[key];
+
+        if (cell) {
+          this._cellStyle(this.ctx, 12, "Arial", "left", "middle", "#111");
+          const { value, bold, italic } = this.data[key];
+
+          let fontStyle = "";
+          if (italic) fontStyle += "italic ";
+          if (bold) fontStyle += "bold ";
+          this.ctx.font = `${fontStyle}14px Arial`;
+
+          const x = col * this.cellWidth - scrollLeft + 2;
+          const y = row * this.cellHeight - scrollTop + this.cellHeight / 2 + 2;
+          this.ctx.fillText(value, x, y);
+        }
+      }
+    }
+  }
+
+  /**
    * Sets cell data with row & column details
    * @param {Number} row - Row Index
    * @param {Number} col - Column Header
@@ -357,34 +386,6 @@ export class Grid {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
-  }
-
-  /**
-   * Renders cell data
-   */
-  renderCellData() {
-    const { scrollLeft, scrollTop, startCol, endCol, startRow, endRow } =
-      this._getVisibleRange();
-
-    for (let row = startRow; row < endRow; row++) {
-      for (let col = startCol; col < endCol; col++) {
-        const key = `${row}:${col}`;
-        const cell = this.data[key];
-        if (cell) {
-          this._cellStyle(this.ctx, 12, "Arial", "left", "middle", "#111");
-          const { value, bold, italic } = this.data[key];
-
-          let fontStyle = "";
-          if (italic) fontStyle += "italic ";
-          if (bold) fontStyle += "bold ";
-          this.ctx.font = `${fontStyle}14px Arial`;
-
-          const x = col * this.cellWidth - scrollLeft + 5;
-          const y = row * this.cellHeight - scrollTop + this.cellHeight / 2 + 5;
-          this.ctx.fillText(value, x, y);
-        }
-      }
-    }
   }
 
   /**
