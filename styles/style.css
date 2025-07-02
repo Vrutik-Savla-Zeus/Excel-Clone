@@ -14,10 +14,6 @@
 .canvas-wrapper {
   position: relative;
   cursor: cell;
-
-  /* will be set in JS */
-  /* width: 50000px; */
-  /* height: 2500000px; */
 }
 
 .top-left-canvas {
@@ -55,19 +51,4 @@
 
   z-index: -10;
   background-color: transparent;
-}
-
-/* SCROLL BARS */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #ccc;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 20px;
 }

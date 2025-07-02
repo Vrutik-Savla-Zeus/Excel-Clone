@@ -1,4 +1,12 @@
 import { Grid } from "./grid.js";
+import { SelectionManager } from "./selectionManager.js";
+
+// const TOTAL_ROWS = 25;
+// const TOTAL_COLUMNS = 7;
+const TOTAL_ROWS = 100000;
+const TOTAL_COLUMNS = 500;
+const CELL_WIDTH = 100;
+const CELL_HEIGHT = 25;
 
 const canvasContainer = document.getElementById("canvasContainer");
 const canvas = document.getElementById("excelCanvas");
@@ -12,11 +20,6 @@ const ctxIndex = canvasIndex.getContext("2d");
 
 const canvasTopLeft = document.getElementById("topLeftCanvas");
 const ctxTopLeft = canvasTopLeft.getContext("2d");
-
-const TOTAL_ROWS = 100000;
-const TOTAL_COLUMNS = 500;
-const CELL_WIDTH = 100;
-const CELL_HEIGHT = 25;
 
 const grid = new Grid(
   canvasContainer,
@@ -34,29 +37,37 @@ const grid = new Grid(
   CELL_HEIGHT
 );
 
-// TEST DATA ENTRY
-grid.setCellData(10, 3, "HELLO");
-grid.setCellData(1, 5, "123", { bold: true, italic: true });
-grid.setCellData(5, 2, "Vrutik", { italic: true });
-grid.setCellData(15, 8, "Savla", { bold: true });
-
-// Initial rendering of cells
-renderGrid();
+// GRID RENDERING
+testData();
+grid.render();
 grid.renderTopLeft();
+canvasContainer.addEventListener(
+  "scroll",
+  // Re-render cells on scroll event
+  (e) => requestAnimationFrame(grid.render())
+);
+window.addEventListener(
+  "resize",
+  // Re-render cells on window resize to set DPR
+  (e) => requestAnimationFrame(grid.render())
+);
 
-canvasContainer.addEventListener("scroll", (e) => {
-  renderGrid(); // Re-render cells on scroll event
+// Cell Selection
+canvasContainer.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left + canvasContainer.scrollLeft;
+  const y = e.clientY - rect.top + canvasContainer.scrollTop;
+
+  const col = Math.floor(x / CELL_WIDTH);
+  const row = Math.floor(y / CELL_HEIGHT);
+
+  grid.selectionManager.setSelectedCell(row, col);
 });
 
-window.addEventListener("resize", (e) => {
-  renderGrid(); // Re-render cells on window resize to set DPR
-});
-
-/**
- * Handles rendering of whole excel grid
- */
-function renderGrid() {
-  grid.renderCells();
-  grid.renderHeader();
-  grid.renderIndex();
+// TEST DATA ENTRY
+function testData() {
+  grid.setCellData(10, 3, "HELLO");
+  grid.setCellData(1, 5, "123", { bold: true, italic: true });
+  grid.setCellData(5, 2, "Vrutik", { italic: true });
+  grid.setCellData(15, 8, "Savla", { bold: true });
 }

@@ -1,5 +1,6 @@
 import { Row } from "./row.js";
 import { Column } from "./column.js";
+import { SelectionManager } from "./selectionManager.js";
 
 export class Grid {
   /**
@@ -69,9 +70,17 @@ export class Grid {
 
     this.data = {};
 
-    this._init();
+    this.selectionManager = new SelectionManager(this);
 
-    console.log(canvasTopLeft, ctxTopLeft);
+    this._init();
+  }
+
+  // METHODS
+  render() {
+    this.renderCells();
+    this.renderHeader();
+    this.renderIndex();
+    this.renderCellData();
   }
 
   /**
@@ -124,26 +133,13 @@ export class Grid {
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
 
-    // Cell Values
-    for (let row = startRow; row < endRow; row++) {
-      for (let col = startCol; col < endCol; col++) {
-        const key = `${row}:${col}`;
-        const cell = this.data[key];
-        if (cell) {
-          this._cellStyle(this.ctx, 12, "Arial", "left", "middle", "#111");
-          const { value, bold, italic } = this.data[key];
-
-          let fontStyle = "";
-          if (italic) fontStyle += "italic ";
-          if (bold) fontStyle += "bold ";
-          this.ctx.font = `${fontStyle}14px Arial`;
-
-          const x = col * this.cellWidth - scrollLeft + 5;
-          const y = row * this.cellHeight - scrollTop + this.cellHeight / 2 + 5;
-          this.ctx.fillText(value, x, y);
-        }
-      }
-    }
+    this.selectionManager.renderSelection(
+      this.ctx,
+      scrollLeft,
+      scrollTop,
+      this.cellWidth,
+      this.cellHeight
+    );
   }
 
   /**
@@ -234,6 +230,27 @@ export class Grid {
   }
 
   /**
+   * Renders Top Left corner of grid
+   */
+  renderTopLeft() {
+    const dpr = window.devicePixelRatio || 1;
+    const width = 50;
+    const height = 25;
+
+    this._setupCanvas(this.ctxTopLeft, this.canvasTopLeft, width, height);
+    this.ctxTopLeft.fillStyle = "#f3f3f3";
+    this.ctxTopLeft.fillRect(0, 0, width, height);
+
+    this.ctxTopLeft.beginPath();
+    this.ctxTopLeft.moveTo(45, 5);
+    this.ctxTopLeft.lineTo(20, 20);
+    this.ctxTopLeft.lineTo(45, 20);
+    this.ctxTopLeft.closePath();
+    this.ctxTopLeft.fillStyle = "#888";
+    this.ctxTopLeft.fill();
+  }
+
+  /**
    * Sets cell data in this.data
    */
   setCellData(row, col, value, style = {}) {
@@ -248,27 +265,7 @@ export class Grid {
     return this.data[`${row}:${col}`] || null;
   }
 
-  /**
-   * Renders Top Left corner of grid
-   */
-  renderTopLeft() {
-    const dpr = window.devicePixelRatio || 1;
-    const width = 50;
-    const height = 25;
-
-    this._setupCanvas(this.ctxTopLeft, this.canvasTopLeft, width, height);
-    this.ctxTopLeft.fillStyle = "#f3f3f3";
-    this.ctxTopLeft.fillRect(0, 0, width, height);
-
-    this.ctxTopLeft.beginPath();
-    this.ctxTopLeft.moveTo(15, 8);
-    this.ctxTopLeft.lineTo(35, 8);
-    this.ctxTopLeft.lineTo(25, 18);
-    this.ctxTopLeft.closePath();
-    this.ctxTopLeft.fillStyle = "#888";
-    this.ctxTopLeft.fill();
-  }
-
+  // PRIVATE METHODS
   /**
    * Initialises grid wrapper & rows / column array
    */
@@ -334,7 +331,6 @@ export class Grid {
    * Helper to set up canvas size, DPR scaling, and clear
    */
   _setupCanvas(ctx, canvas, width, height) {
-    console.log(ctx, canvas, width, height);
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -343,6 +339,34 @@ export class Grid {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
+  }
+
+  /**
+   * Renders cell data
+   */
+  renderCellData() {
+    const { scrollLeft, scrollTop, startCol, endCol, startRow, endRow } =
+      this._getVisibleRange();
+
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
+        const key = `${row}:${col}`;
+        const cell = this.data[key];
+        if (cell) {
+          this._cellStyle(this.ctx, 12, "Arial", "left", "middle", "#111");
+          const { value, bold, italic } = this.data[key];
+
+          let fontStyle = "";
+          if (italic) fontStyle += "italic ";
+          if (bold) fontStyle += "bold ";
+          this.ctx.font = `${fontStyle}14px Arial`;
+
+          const x = col * this.cellWidth - scrollLeft + 5;
+          const y = row * this.cellHeight - scrollTop + this.cellHeight / 2 + 5;
+          this.ctx.fillText(value, x, y);
+        }
+      }
+    }
   }
 
   /**
