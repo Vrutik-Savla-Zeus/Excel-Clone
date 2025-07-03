@@ -100,7 +100,7 @@ export class EventManager {
 
       const finishEdit = () => {
         const value = this.cellInput.value.trim();
-        if (value) this.cellData.setCellData(row, col, value);
+        this.cellData.setCellData(row, col, value);
         this.cellInput.style.display = "none";
         this.setEditingCell(null, null);
         this.gridCanvas.render();

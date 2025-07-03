@@ -1,9 +1,4 @@
-import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  cellStyle,
-  getVisibleRange,
-} from "../utils/utils.js";
+import { CELL_HEIGHT, CELL_WIDTH, cellStyle } from "../utils/utils.js";
 
 export class CellData {
   constructor() {
@@ -64,10 +59,19 @@ export class CellData {
     return this.data[`${row}:${col}`] || null;
   }
 
-  generateDummyData() {
-    this.setCellData(10, 3, "HELLO");
-    this.setCellData(1, 5, "123", { bold: true, italic: true });
-    this.setCellData(5, 2, "Vrutik", { italic: true });
-    this.setCellData(15, 8, "Savla", { bold: true });
+  async loadFromJSON(jsonArray) {
+    const keyArray = Object.keys(jsonArray[0]);
+    for (let i = 0; i < keyArray.length; i++) {
+      this.setCellData(0, i, keyArray[i]);
+    }
+
+    for (let row = 0; row < jsonArray.length; row++) {
+      const data = jsonArray[row];
+
+      for (let col = 0; col < keyArray.length; col++) {
+        const value = data[keyArray[col]];
+        this.setCellData(row + 1, col, value);
+      }
+    }
   }
 }

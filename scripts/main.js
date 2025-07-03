@@ -19,7 +19,6 @@ const dom = new ExcelDOMRenderer();
 
 // 2. Cell Data Setup
 const cellData = new CellData();
-cellData.generateDummyData(); // Optional test data
 
 // 3. Set wrapper size
 dom.wrapper.style.width = `${TOTAL_COLUMNS * CELL_WIDTH + CELL_WIDTH / 2}px`;
@@ -52,3 +51,22 @@ eventManager.init();
 
 // 7. Initial Render
 render();
+
+////////////////////////////////////////////////////////////////////////
+async function fetchData(path) {
+  try {
+    const response = await fetch(path);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    cellData.loadFromJSON(data);
+  } catch (error) {
+    console.error(`Error fetching in JSON data: ${error}`);
+  }
+}
+await fetchData("../data/data.json");
+gridCanvas.render();
