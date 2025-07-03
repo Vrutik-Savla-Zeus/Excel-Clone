@@ -1,8 +1,37 @@
 import { CELL_HEIGHT, CELL_WIDTH } from "../utils/utils.js";
 
 export class ExcelDOMRenderer {
-  constructor(container) {
-    this.container = container;
+  constructor() {
+    this.container = this._createCanvasContainer();
+    this.wrapper = this._createCanvasWrapper();
+    this.cellInput = this._createInput();
+
+    this.container.appendChild(this.wrapper);
+    document.body.appendChild(this.container);
+    document.body.appendChild(this.cellInput);
+  }
+
+  _createCanvasContainer() {
+    const container = document.createElement("div");
+    container.className = "canvas-container";
+    container.id = "canvasContainer";
+    return container;
+  }
+
+  _createCanvasWrapper() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "canvas-wrapper";
+    wrapper.id = "canvasWrapper";
+    return wrapper;
+  }
+
+  _createInput() {
+    const input = document.createElement("input");
+    input.id = "cellInput";
+    input.name = "cell-input";
+    input.type = "text";
+    input.className = "cell-input";
+    return input;
   }
 
   getInputPosition(row, col) {
