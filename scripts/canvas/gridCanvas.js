@@ -23,7 +23,6 @@ export class GridCanvas {
     this.cellData = cellData;
 
     this._init();
-    this.cellData.generateDummyData();
     this.render();
   }
 
