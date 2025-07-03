@@ -1,11 +1,13 @@
+import { getDpr } from "../utils/utils.js";
+
 export class SelectionManager {
   /**
    * Represents the full grid rendered on canvas.
    * @param {class} grid - Grid class
    */
-  constructor(grid) {
-    /** @type {grid} */
-    this.grid = grid;
+  constructor(gridCanvas) {
+    /** @type {gridCanvas} */
+    this.gridCanvas = gridCanvas;
 
     /** @type {Object} */
     this.selectedCell = null;
@@ -22,8 +24,7 @@ export class SelectionManager {
    */
   renderSelection(ctx, scrollLeft, scrollTop, cellWidth, cellHeight) {
     if (!this.selectedCell) return;
-
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getDpr();
 
     const { row, col } = this.selectedCell;
     const x = col * cellWidth - scrollLeft;
@@ -33,7 +34,6 @@ export class SelectionManager {
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
     ctx.strokeRect(x + 1, y + 1, cellWidth - 1, cellHeight - 1);
-    console.log(x + 1, y + 1, cellWidth - 1, cellHeight - 1);
     ctx.restore();
   }
 
@@ -44,7 +44,7 @@ export class SelectionManager {
    */
   setSelectedCell(row, col) {
     this.selectedCell = { row, col };
-    this.grid.render();
+    this.gridCanvas.render();
   }
 
   /**
