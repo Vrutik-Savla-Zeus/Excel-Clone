@@ -1,4 +1,4 @@
-import { CELL_HEIGHT, CELL_WIDTH, getDpr } from "../utils/utils.js";
+import { CELL_HEIGHT, CELL_WIDTH, getDpr, TOTAL_ROWS } from "../utils/utils.js";
 
 /**
  * Manages events (scroll, resize, pointer) for grid interaction,
@@ -34,6 +34,9 @@ export class EventManager {
     // For double-click detection
     this.lastClickTime = 0;
     this.lastClickCell = null;
+
+    // For all column selection
+    this.isColumnSelecting = false;
 
     this._init();
   }
@@ -103,6 +106,38 @@ export class EventManager {
       const col = Math.floor(x / CELL_WIDTH);
       const row = Math.floor(y / CELL_HEIGHT);
 
+      // All column selection
+      const isHeaderClick = row === -1 || y < CELL_HEIGHT;
+      if (isHeaderClick) {
+        this.isColumnSelecting = true;
+
+        this.gridCanvas.selectionManager.setAnchorCell(0, col);
+        this.gridCanvas.selectionManager.setFocusCell(TOTAL_ROWS - 1, col);
+        this.render();
+
+        const onMove = (e) => {
+          const moveX = e.clientX - rect.left + this.container.scrollLeft;
+          const moveCol = Math.floor(moveX / CELL_WIDTH);
+
+          this.gridCanvas.selectionManager.setFocusCell(
+            TOTAL_ROWS - 1,
+            moveCol
+          );
+          this.render();
+        };
+
+        const onUp = (e) => {
+          this.isColumnSelecting = false;
+          this.container.removeEventListener("pointermove", onMove);
+          this.container.removeEventListener("pointerup", onUp);
+        };
+
+        this.container.addEventListener("pointermove", onMove);
+        this.container.addEventListener("pointerup", onUp);
+
+        return;
+      }
+
       // Double-click detection based on time and cell location
       const now = Date.now();
       const isSameCell =
@@ -168,7 +203,7 @@ export class EventManager {
     });
 
     this.container.addEventListener("click", (e) => {
-      if (hasDragged) {
+      if (hasDragged || this.isColumnSelecting) {
         e.preventDefault(); // Prevent post-drag click
         return;
       }

@@ -64,6 +64,28 @@ export class HeaderCanvas {
       }
     }
 
+    // ✅ Highlight selected headers
+    if (this.selectionManager.isFullColumnSelection()) {
+      const { startCol, endCol } =
+        this.selectionManager.getSelectedColumnsRange();
+
+      for (let col = startCol; col <= endCol; col++) {
+        const x = col * CELL_WIDTH - scrollLeft;
+        const y = 0;
+
+        this.ctx.fillStyle = "#007b3e"; // dark green
+        this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+
+        // Optional: Draw header label again if needed
+        this.ctx.fillStyle = "#fff";
+        this.ctx.font = "bold 12px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        const label = String.fromCharCode(65 + col); // A, B, C...
+        this.ctx.fillText(label, x + CELL_WIDTH / 2, y + CELL_HEIGHT / 2);
+      }
+    }
+
     // Header strokes
     this.ctx.save();
     this.ctx.beginPath();

@@ -83,11 +83,12 @@ FEATURES:
 4. Select all button (top left corner in excel) (COMPLETED) 
 5. Single cell selection (COMPLETED)
 6. Cell input and editing (COMPLETED)
+10. Multi cell selection (COMPLETED)
 
 7. Data load from any json file
 8. Data load from any csv file
 9. Json to csv csv to json download
-10. Multi cell selection
+
 11. All row / rows selection
 12. All column / columns selection
 13. Multiple cell selection (ctrl button)

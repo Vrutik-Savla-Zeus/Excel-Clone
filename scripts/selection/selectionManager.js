@@ -1,4 +1,4 @@
-import { getDpr } from "../utils/utils.js";
+import { getDpr, TOTAL_ROWS } from "../utils/utils.js";
 
 export class SelectionManager {
   constructor(gridCanvas) {
@@ -86,5 +86,22 @@ export class SelectionManager {
 
   getSelectedCell() {
     return this.selectedCell;
+  }
+
+  isFullColumnSelection() {
+    return (
+      this.anchorCell &&
+      this.focusCell &&
+      this.anchorCell.row === 0 &&
+      this.focusCell.row === TOTAL_ROWS - 1
+    );
+  }
+
+  getSelectedColumnsRange() {
+    if (!this.isFullColumnSelection()) return null;
+
+    const startCol = Math.min(this.anchorCell.col, this.focusCell.col);
+    const endCol = Math.max(this.anchorCell.col, this.focusCell.col);
+    return { startCol, endCol };
   }
 }

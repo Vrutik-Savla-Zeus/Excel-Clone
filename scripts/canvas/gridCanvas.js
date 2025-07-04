@@ -61,7 +61,22 @@ export class GridCanvas {
             row === this.selectionManager.anchorCell.row &&
             col === this.selectionManager.anchorCell.col
               ? "#fff"
-              : "#c2f0c2";
+              : "#d1f5d3";
+          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        }
+      }
+    }
+
+    if (this.selectionManager.isFullColumnSelection()) {
+      const { startCol, endCol } =
+        this.selectionManager.getSelectedColumnsRange();
+
+      for (let col = startCol; col <= endCol; col++) {
+        for (let row = startRow; row < endRow; row++) {
+          const x = col * CELL_WIDTH;
+          const y = row * CELL_HEIGHT;
+
+          this.ctx.fillStyle = "#d1f5d3";
           this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
         }
       }
