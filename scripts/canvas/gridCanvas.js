@@ -6,6 +6,8 @@ import {
   getDpr,
   getVisibleRange,
   setupCanvas,
+  TOTAL_COLUMNS,
+  TOTAL_ROWS,
 } from "../utils/utils.js";
 
 export class GridCanvas {
@@ -66,8 +68,8 @@ export class GridCanvas {
     this.ctx.restore();
 
     // Fixed strokes: top and left border of viewport
-    const maxX = this.totalColumns * CELL_WIDTH;
-    const maxY = this.totalRows * CELL_HEIGHT;
+    const maxX = TOTAL_COLUMNS * CELL_WIDTH;
+    const maxY = TOTAL_ROWS * CELL_HEIGHT;
     this.ctx.beginPath();
     this.ctx.moveTo(0, 0);
     this.ctx.lineTo(Math.min(viewWidth, maxX), 0);

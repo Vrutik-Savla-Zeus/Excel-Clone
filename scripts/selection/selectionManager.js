@@ -33,7 +33,7 @@ export class SelectionManager {
     ctx.save();
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
-    ctx.strokeRect(x + 1, y + 1, cellWidth - 1, cellHeight - 1);
+    ctx.strokeRect(x + 1, y + 1, cellWidth - 2, cellHeight - 2);
     ctx.restore();
   }
 

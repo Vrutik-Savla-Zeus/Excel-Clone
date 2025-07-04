@@ -31,7 +31,7 @@
   top: 25px;
   left: 50px;
 
-  z-index: -10;
+  z-index: -30;
   background-color: transparent;
 }
 
@@ -55,7 +55,7 @@
 
 .cell-input {
   position: fixed;
-  z-index: -10;
+  z-index: -20;
   font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
   color: #111;
