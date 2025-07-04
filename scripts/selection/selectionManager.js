@@ -1,56 +1,89 @@
 import { getDpr } from "../utils/utils.js";
 
 export class SelectionManager {
-  /**
-   * Represents the full grid rendered on canvas.
-   * @param {class} grid - Grid class
-   */
   constructor(gridCanvas) {
-    /** @type {gridCanvas} */
     this.gridCanvas = gridCanvas;
 
-    /** @type {Object} */
     this.selectedCell = null;
+    this.anchorCell = null;
+    this.focusCell = null;
+
+    this.isSelecting = false;
   }
 
-  /**
-   * Renders cell selection
-   * @param {CanvasRenderingContext2D} ctx - Canvas 2d context
-   * @param {Number} scrollLeft
-   * @param {Number} scrollTop
-   * @param {Number} cellWidth
-   * @param {Number} cellHeight
-   * @returns null
-   */
   renderSelection(ctx, scrollLeft, scrollTop, cellWidth, cellHeight) {
-    if (!this.selectedCell) return;
+    if (!this.anchorCell || !this.focusCell) return;
+
     const dpr = getDpr();
+    const { startRow, endRow, startCol, endCol } = this.getSelectedRange();
 
-    const { row, col } = this.selectedCell;
-    const x = col * cellWidth - scrollLeft;
-    const y = row * cellHeight - scrollTop;
-
+    // Already inside translate in gridCanvas
     ctx.save();
+
+    const borderX = startCol * cellWidth;
+    const borderY = startRow * cellHeight;
+    const borderW = (endCol - startCol + 1) * cellWidth;
+    const borderH = (endRow - startRow + 1) * cellHeight;
+
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
-    ctx.strokeRect(x + 1, y + 1, cellWidth - 2, cellHeight - 2);
+    ctx.strokeRect(borderX + 1, borderY + 1, borderW - 2, borderH - 2);
+
     ctx.restore();
   }
 
-  /**
-   * Sets selected cell to seleted object
-   * @param {Number} row - Row index
-   * @param {Number} col- Column header
-   */
+  setAnchorCell(row, col) {
+    this.anchorCell = { row, col };
+    this.focusCell = { row, col };
+    this.selectedCell = { row, col };
+  }
+
+  setFocusCell(row, col) {
+    this.focusCell = { row, col };
+    this.selectedCell = { row, col };
+  }
+
+  clearSelection() {
+    this.anchorCell = null;
+    this.focusCell = null;
+    this.selectedCell = null;
+    this.isSelecting = false;
+  }
+
+  getSelectedRange() {
+    if (!this.anchorCell || !this.focusCell) return null;
+
+    const startRow = Math.min(this.anchorCell.row, this.focusCell.row);
+    const endRow = Math.max(this.anchorCell.row, this.focusCell.row);
+    const startCol = Math.min(this.anchorCell.col, this.focusCell.col);
+    const endCol = Math.max(this.anchorCell.col, this.focusCell.col);
+
+    return { startRow, endRow, startCol, endCol };
+  }
+
+  isCellInSelection(row, col) {
+    const range = this.getSelectedRange();
+    if (!range) return false;
+
+    return (
+      row >= range.startRow &&
+      row <= range.endRow &&
+      col >= range.startCol &&
+      col <= range.endCol
+    );
+  }
+
   setSelectedCell(row, col) {
+    this.anchorCell = { row, col };
+    this.focusCell = { row, col };
     this.selectedCell = { row, col };
     this.gridCanvas.render();
   }
 
-  /**
-   * Gets selected cell
-   * @returns Object with row and col
-   */
+  getAnchorCell() {
+    return this.anchorCell;
+  }
+
   getSelectedCell() {
     return this.selectedCell;
   }

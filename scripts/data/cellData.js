@@ -60,18 +60,33 @@ export class CellData {
   }
 
   async loadFromJSON(jsonArray) {
-    const keyArray = Object.keys(jsonArray[0]);
-    for (let i = 0; i < keyArray.length; i++) {
-      this.setCellData(0, i, keyArray[i]);
+    this.jsonRaw = jsonArray; // Store raw JSON for later access
+    this.columns = Object.keys(jsonArray[0]);
+
+    // Load only visible data (initial ~50 rows)
+    const INITIAL_ROWS = 100;
+
+    for (let i = 0; i < this.columns.length; i++) {
+      this.setCellData(0, i, this.columns[i]); // header
     }
 
-    for (let row = 0; row < jsonArray.length; row++) {
+    for (let row = 0; row < INITIAL_ROWS; row++) {
       const data = jsonArray[row];
-
-      for (let col = 0; col < keyArray.length; col++) {
-        const value = data[keyArray[col]];
+      for (let col = 0; col < this.columns.length; col++) {
+        const value = data[this.columns[col]];
         this.setCellData(row + 1, col, value);
       }
     }
+
+    // Optional: Queue the rest for background loading
+    requestIdleCallback(() => {
+      for (let row = INITIAL_ROWS; row < jsonArray.length; row++) {
+        const data = jsonArray[row];
+        for (let col = 0; col < this.columns.length; col++) {
+          const value = data[this.columns[col]];
+          this.setCellData(row + 1, col, value);
+        }
+      }
+    });
   }
 }

@@ -12,6 +12,7 @@ import {
   TOTAL_COLUMNS,
   CELL_WIDTH,
   CELL_HEIGHT,
+  fetchData,
 } from "./utils/utils.js";
 
 // 1. DOM Setup
@@ -26,8 +27,11 @@ dom.wrapper.style.height = `${TOTAL_ROWS * CELL_HEIGHT + CELL_HEIGHT}px`;
 
 // 4. Canvas Instantiation
 const gridCanvas = new GridCanvas(dom.container, cellData);
-const headerCanvas = new HeaderCanvas(dom.container);
-const indexCanvas = new IndexCanvas(dom.container);
+const headerCanvas = new HeaderCanvas(
+  dom.container,
+  gridCanvas.selectionManager
+);
+const indexCanvas = new IndexCanvas(dom.container, gridCanvas.selectionManager);
 const selectAllCanvas = new SelectAllCanvas(dom.container);
 
 // 5. Render Method
@@ -47,26 +51,8 @@ const eventManager = new EventManager({
   gridCanvas,
   cellData,
 });
-eventManager.init();
 
 // 7. Initial Render
 render();
-
-////////////////////////////////////////////////////////////////////////
-async function fetchData(path) {
-  try {
-    const response = await fetch(path);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    cellData.loadFromJSON(data);
-  } catch (error) {
-    console.error(`Error fetching in JSON data: ${error}`);
-  }
-}
-await fetchData("../data/data.json");
+await fetchData("../../data/data.json", cellData);
 gridCanvas.render();

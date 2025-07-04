@@ -7,8 +7,9 @@ import {
 } from "../utils/utils.js";
 
 export class IndexCanvas {
-  constructor(container) {
+  constructor(container, selectionManager) {
     this.container = container;
+    this.selectionManager = selectionManager;
 
     this.canvas = document.createElement("canvas");
     this.canvas.className = "index-canvas";
@@ -33,19 +34,41 @@ export class IndexCanvas {
     );
     setupCanvas(this.ctx, this.canvas, indexWidth, viewHeight);
 
-    // Index color
-    this.ctx.fillStyle = "#f3f3f3";
-    const visibleRowsHeight = (endRow - startRow) * CELL_HEIGHT;
-    this.ctx.fillRect(0, 0, indexWidth, visibleRowsHeight);
+    const selectedRange = this.selectionManager.getSelectedRange();
 
-    // Index labels
-    cellStyle(this.ctx, 12, "Arial", "center", "middle", "#111");
     for (let i = startRow; i < endRow; i++) {
       const y = i * CELL_HEIGHT - scrollTop;
+
+      // If row is within selected range, fill light green background
+      const isSelected =
+        selectedRange &&
+        i >= selectedRange.startRow &&
+        i <= selectedRange.endRow;
+
+      if (isSelected) {
+        this.ctx.fillStyle = "#d1ffd1"; // light green
+        this.ctx.fillRect(0, y, indexWidth, CELL_HEIGHT);
+      } else {
+        this.ctx.fillStyle = "#f3f3f3"; // default
+        this.ctx.fillRect(0, y, indexWidth, CELL_HEIGHT);
+      }
+
+      // Text
+      cellStyle(this.ctx, 12, "Arial", "center", "middle", "#111");
       this.ctx.fillText(i + 1, indexWidth / 2, y + CELL_HEIGHT / 2);
+
+      // Border for selected row
+      if (isSelected) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(indexWidth - 1 / dpr, y);
+        this.ctx.lineTo(indexWidth - 1 / dpr, y + CELL_HEIGHT);
+        this.ctx.strokeStyle = "#008000";
+        this.ctx.lineWidth = 2 / dpr;
+        this.ctx.stroke();
+      }
     }
 
-    // Index strokes
+    // Horizontal grid lines
     this.ctx.save();
     this.ctx.beginPath();
 

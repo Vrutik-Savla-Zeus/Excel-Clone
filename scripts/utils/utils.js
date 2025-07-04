@@ -109,3 +109,19 @@ export function getColumnLabel(index) {
 export function getDpr() {
   return window.devicePixelRatio || 1;
 }
+
+export async function fetchData(path, cellDataInstance) {
+  try {
+    const response = await fetch(path);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    cellDataInstance.loadFromJSON(data);
+  } catch (error) {
+    console.error(`Error fetching in JSON data: ${error}`);
+  }
+}

@@ -2,7 +2,6 @@ import { SelectionManager } from "../selection/selectionManager.js";
 import {
   CELL_HEIGHT,
   CELL_WIDTH,
-  cellStyle,
   getDpr,
   getVisibleRange,
   setupCanvas,
@@ -48,6 +47,26 @@ export class GridCanvas {
     setupCanvas(this.ctx, this.canvas, viewWidth, viewHeight);
     this.ctx.save();
     this.ctx.translate(-scrollLeft, -scrollTop);
+
+    const range = this.selectionManager.getSelectedRange();
+    if (range) {
+      const { startRow, endRow, startCol, endCol } = range;
+
+      for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+          const x = col * CELL_WIDTH;
+          const y = row * CELL_HEIGHT;
+
+          this.ctx.fillStyle =
+            row === this.selectionManager.anchorCell.row &&
+            col === this.selectionManager.anchorCell.col
+              ? "#fff"
+              : "#c2f0c2";
+          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        }
+      }
+    }
+
     this.ctx.beginPath();
 
     // Horizontal lines
@@ -62,9 +81,20 @@ export class GridCanvas {
       this.ctx.moveTo(x, startRow * CELL_HEIGHT);
       this.ctx.lineTo(x, endRow * CELL_HEIGHT);
     }
+
     this.ctx.strokeStyle = "#ccc";
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
+
+    // Cell selection
+    this.selectionManager.renderSelection(
+      this.ctx,
+      scrollLeft,
+      scrollTop,
+      CELL_WIDTH,
+      CELL_HEIGHT
+    );
+
     this.ctx.restore();
 
     // Fixed strokes: top and left border of viewport
@@ -78,15 +108,6 @@ export class GridCanvas {
     this.ctx.strokeStyle = "#ccc";
     this.ctx.lineWidth = 1 / dpr;
     this.ctx.stroke();
-
-    // Cell selection
-    this.selectionManager.renderSelection(
-      this.ctx,
-      scrollLeft,
-      scrollTop,
-      CELL_WIDTH,
-      CELL_HEIGHT
-    );
 
     // Cell Data
     this.cellData.render(this.ctx, {

@@ -52,11 +52,6 @@ FEATURES:
 10. Insert column & insert rows
 11. select rows and columns through mouse and keyboard
  
-
-
-
-
-
 Please make sure we create separate classes for 
 1. grid
 2. Try and create a separate class for each action that you perform.
@@ -72,14 +67,39 @@ Actions like typing, column resizing, row resizing should be a part of undo - re
  
 Match the look and feel of the excel grid. Carefully look at the line thickness. 
 
-26 | 06 | 2025:
-- Implement render on scroll
-- Implement 1 lakh rows and 500 columns
 
-| Step | Description                                                                                      |
-| ---- | ------------------------------------------------------------------------------------------------ |
-| 01   | Basic grid rendering on a canvas                                                                 |
-| 02   | Scrollable grid with `canvasContainer`                                                           |
-| 03   | Dynamic rendering of visible cells only                                                          |
-| 04   | Fixed headers (`A`, `B`, `C`...) and row indexes (`1`, `2`, `3`...)                              |
-| 05   | Styled cell rendering with a data model (`setCellData`, `getCellData`) and clean rendering logic |
+
+
+
+
+
+
+
+
+FEATURES:
+1. Excel grid (upto 1 lakh rows and 500 columns) (COMPLETED)
+2. Column headers (COMPLETED)
+3. Row indexes (COMPLETED)
+4. Select all button (top left corner in excel) (COMPLETED) 
+5. Single cell selection (COMPLETED)
+6. Cell input and editing (COMPLETED)
+
+7. Data load from any json file
+8. Data load from any csv file
+9. Json to csv csv to json download
+10. Multi cell selection
+11. All row / rows selection
+12. All column / columns selection
+13. Multiple cell selection (ctrl button)
+14. Select rows through mouse and keyboard
+15. Select columns through mouse and keyboard
+16. Row resizing
+17. Column resizing
+18. Cell draging (replacing cells (drag and drop))
+19. Insert new row (+1 up and +1 down)
+20. Insert new column (+1 left and +1 right)
+21. Bold and italic feature in cell input and cell editing
+22. Compute count, min, max, sum and average of selected cells if they have numbers.
+23. Undo and Redo
+
+// Okay, so we will go step wise now. Now what I need is, each step will be of atleast two parts, part one, you will give me task to be implemented and I will try to implement it on my own. Then below that you will give me steps to implement it. If I faced any difficulty then I will refer those steps and below that you will give me logic as well. So my skills will get improved. Part 2 will be of cross checking, once my code implementation is done you will show your code and we will discuss optimal code implementation by comparing both. Note in part one you will strictly not give me a single line of code, I will try to implement everything on my own. Lets start with step 1 now, we willcomplement small small micro tasks in each step..
