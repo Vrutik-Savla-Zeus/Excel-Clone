@@ -212,7 +212,7 @@ export class EventManager {
       this.cellData.setCellData(row, col, value);
       this.cellInput.style.display = "none";
       this.setEditingCell(null, null);
-      this.gridCanvas.render();
+      this.render();
     };
 
     this.cellInput.onkeydown = (event) => {
