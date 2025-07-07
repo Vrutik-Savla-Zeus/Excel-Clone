@@ -149,5 +149,3 @@ export class GridCanvas {
     });
   }
 }
-
-//1. On scrolling through click on scroll bars bottom or right the column and row selection is not staying persistant

@@ -39,8 +39,6 @@ export class IndexCanvas {
 
     for (let i = startRow; i < endRow; i++) {
       const y = i * CELL_HEIGHT - scrollTop;
-
-      // If row is within selected range, fill light green background
       const isSelected =
         selectedRange &&
         i >= selectedRange.startRow &&

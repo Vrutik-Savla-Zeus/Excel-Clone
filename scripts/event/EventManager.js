@@ -97,14 +97,28 @@ export class EventManager {
   _handlePointerEvents() {
     const gridCanvasEl = document.getElementById("gridCanvas");
     let startX = 0,
-      startY = 0;
-    let hasDragged = false;
+      startY = 0,
+      hasDragged = false;
 
     this.container.addEventListener("pointerdown", (e) => {
       hasDragged = false;
       this.isDragging = true;
 
       const rect = gridCanvasEl.getBoundingClientRect();
+
+      // GUARD CLAUSE: Check if the click was inside the canvas bounds (avoid scrollbar)
+      const canvasBounds = gridCanvasEl.getBoundingClientRect();
+      const xInCanvas = e.clientX - canvasBounds.left;
+      const yInCanvas = e.clientY - canvasBounds.top;
+      if (
+        xInCanvas < -(CELL_WIDTH / 2) ||
+        yInCanvas < -CELL_HEIGHT ||
+        xInCanvas > gridCanvasEl.clientWidth - CELL_WIDTH ||
+        yInCanvas > gridCanvasEl.clientHeight - CELL_HEIGHT
+      ) {
+        return;
+      }
+
       const x = e.clientX - rect.left + this.container.scrollLeft;
       const y = e.clientY - rect.top + this.container.scrollTop;
 
@@ -114,8 +128,17 @@ export class EventManager {
       const col = Math.floor(x / CELL_WIDTH);
       const row = Math.floor(y / CELL_HEIGHT);
 
+      // // Bounds for full grid content
+      // const canvasWidth = TOTAL_COLUMNS * CELL_WIDTH;
+      // const canvasHeight = TOTAL_ROWS * CELL_HEIGHT;
+
+      // // Click outside the grid (e.g., scrollbar area)
+      // if (x < 0 || y < 0 || x >= canvasWidth || y >= canvasHeight) {
+      //   return;
+      // }
+
       // All column selection
-      const isHeaderClick = row === -1 || y < CELL_HEIGHT;
+      const isHeaderClick = row === -1 && y < CELL_HEIGHT;
       if (isHeaderClick) {
         this.isColumnSelecting = true;
 
@@ -148,7 +171,7 @@ export class EventManager {
       }
 
       // All row selection
-      const isIndexClick = col === -1 || x < CELL_WIDTH / 2;
+      const isIndexClick = col === -1 && x < CELL_WIDTH / 2;
       if (isIndexClick) {
         this.isRowSelecting = true;
 
