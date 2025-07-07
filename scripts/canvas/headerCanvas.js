@@ -64,7 +64,7 @@ export class HeaderCanvas {
       }
     }
 
-    // ✅ Highlight selected headers
+    // Highlight selected headers
     if (this.selectionManager.isFullColumnSelection()) {
       const { startCol, endCol } =
         this.selectionManager.getSelectedColumnsRange();
@@ -76,13 +76,10 @@ export class HeaderCanvas {
         this.ctx.fillStyle = "#007b3e"; // dark green
         this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
 
-        // Optional: Draw header label again if needed
-        this.ctx.fillStyle = "#fff";
-        this.ctx.font = "bold 12px Arial";
-        this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle";
-        const label = String.fromCharCode(65 + col); // A, B, C...
-        this.ctx.fillText(label, x + CELL_WIDTH / 2, y + CELL_HEIGHT / 2);
+        // Draw header label again
+        const label = getColumnLabel(col);
+        cellStyle(this.ctx, 12, "Arial", "center", "middle", "#fff", true);
+        this.ctx.fillText(label, x + CELL_WIDTH / 2, CELL_HEIGHT / 2);
       }
     }
 

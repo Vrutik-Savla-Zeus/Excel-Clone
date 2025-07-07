@@ -1,5 +1,6 @@
 import {
   CELL_HEIGHT,
+  CELL_WIDTH,
   cellStyle,
   getDpr,
   getVisibleRange,
@@ -65,6 +66,23 @@ export class IndexCanvas {
         this.ctx.strokeStyle = "#008000";
         this.ctx.lineWidth = 2 / dpr;
         this.ctx.stroke();
+      }
+    }
+
+    // Highlight Selected indexes
+    if (this.selectionManager.isFullRowSelection()) {
+      const { startRow, endRow } = this.selectionManager.getSelectedRowsRange();
+
+      for (let row = startRow; row <= endRow; row++) {
+        const x = 0;
+        const y = row * CELL_HEIGHT - scrollTop;
+
+        this.ctx.fillStyle = "#007b3e";
+        this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+
+        // Draw index label again
+        cellStyle(this.ctx, 12, "Arial", "center", "middle", "#fff", true);
+        this.ctx.fillText(row + 1, indexWidth / 2, y + CELL_HEIGHT / 2);
       }
     }
 

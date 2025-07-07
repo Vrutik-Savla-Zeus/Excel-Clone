@@ -1,4 +1,10 @@
-import { CELL_HEIGHT, CELL_WIDTH, getDpr, TOTAL_ROWS } from "../utils/utils.js";
+import {
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  getDpr,
+  TOTAL_COLUMNS,
+  TOTAL_ROWS,
+} from "../utils/utils.js";
 
 /**
  * Manages events (scroll, resize, pointer) for grid interaction,
@@ -35,8 +41,9 @@ export class EventManager {
     this.lastClickTime = 0;
     this.lastClickCell = null;
 
-    // For all column selection
+    // For all column and row selection
     this.isColumnSelecting = false;
+    this.isRowSelecting = false;
     this.suppressNextClick = false;
 
     this._init();
@@ -140,6 +147,38 @@ export class EventManager {
         return;
       }
 
+      // All row selection
+      const isIndexClick = col === -1 || x < CELL_WIDTH / 2;
+      if (isIndexClick) {
+        this.isRowSelecting = true;
+
+        this.gridCanvas.selectionManager.setAnchorCell(row, 0);
+        this.gridCanvas.selectionManager.setFocusCell(row, TOTAL_COLUMNS - 1);
+        this.render();
+
+        const onMove = (e) => {
+          const moveY = e.clientY - rect.top + this.container.scrollTop;
+          const moveRow = Math.floor(moveY / CELL_HEIGHT);
+
+          this.gridCanvas.selectionManager.setFocusCell(
+            moveRow,
+            TOTAL_COLUMNS - 1
+          );
+          this.render();
+        };
+        const onUp = (e) => {
+          this.isRowSelecting = false;
+          this.suppressNextClick = true;
+          this.container.removeEventListener("pointermove", onMove);
+          this.container.removeEventListener("pointerup", onUp);
+        };
+
+        this.container.addEventListener("pointermove", onMove);
+        this.container.addEventListener("pointerup", onUp);
+
+        return;
+      }
+
       // Double-click detection based on time and cell location
       const now = Date.now();
       const isSameCell =
@@ -205,12 +244,16 @@ export class EventManager {
     });
 
     this.container.addEventListener("click", (e) => {
-      if (hasDragged || this.isColumnSelecting || this.suppressNextClick) {
+      if (
+        hasDragged ||
+        this.isColumnSelecting ||
+        this.isRowSelecting ||
+        this.suppressNextClick
+      ) {
         e.preventDefault(); // Prevent post-drag click
         this.suppressNextClick = false;
         return;
       }
-
       const rect = gridCanvasEl.getBoundingClientRect();
       const x = e.clientX - rect.left + this.container.scrollLeft;
       const y = e.clientY - rect.top + this.container.scrollTop;

@@ -82,6 +82,20 @@ export class GridCanvas {
       }
     }
 
+    if (this.selectionManager.isFullRowSelection()) {
+      const { startRow, endRow } = this.selectionManager.getSelectedRowsRange();
+
+      for (let col = startCol; col <= endCol; col++) {
+        for (let row = startRow; row < endRow; row++) {
+          const x = col * CELL_WIDTH;
+          const y = row * CELL_HEIGHT;
+
+          this.ctx.fillStyle = "#d1f5d3";
+          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        }
+      }
+    }
+
     this.ctx.beginPath();
 
     // Horizontal lines
@@ -135,3 +149,5 @@ export class GridCanvas {
     });
   }
 }
+
+//1. On scrolling through click on scroll bars bottom or right the column and row selection is not staying persistant
