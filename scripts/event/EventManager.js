@@ -37,6 +37,7 @@ export class EventManager {
 
     // For all column selection
     this.isColumnSelecting = false;
+    this.suppressNextClick = false;
 
     this._init();
   }
@@ -128,6 +129,7 @@ export class EventManager {
 
         const onUp = (e) => {
           this.isColumnSelecting = false;
+          this.suppressNextClick = true; // prevent immediate click reset
           this.container.removeEventListener("pointermove", onMove);
           this.container.removeEventListener("pointerup", onUp);
         };
@@ -203,8 +205,9 @@ export class EventManager {
     });
 
     this.container.addEventListener("click", (e) => {
-      if (hasDragged || this.isColumnSelecting) {
+      if (hasDragged || this.isColumnSelecting || this.suppressNextClick) {
         e.preventDefault(); // Prevent post-drag click
+        this.suppressNextClick = false;
         return;
       }
 
