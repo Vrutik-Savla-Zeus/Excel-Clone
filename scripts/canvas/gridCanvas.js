@@ -72,7 +72,7 @@ export class GridCanvas {
         this.selectionManager.getSelectedColumnsRange();
 
       for (let col = startCol; col <= endCol; col++) {
-        for (let row = startRow; row < endRow; row++) {
+        for (let row = startRow; row <= endRow; row++) {
           const x = col * CELL_WIDTH;
           const y = row * CELL_HEIGHT;
 
@@ -86,7 +86,7 @@ export class GridCanvas {
       const { startRow, endRow } = this.selectionManager.getSelectedRowsRange();
 
       for (let col = startCol; col <= endCol; col++) {
-        for (let row = startRow; row < endRow; row++) {
+        for (let row = startRow; row <= endRow; row++) {
           const x = col * CELL_WIDTH;
           const y = row * CELL_HEIGHT;
 
