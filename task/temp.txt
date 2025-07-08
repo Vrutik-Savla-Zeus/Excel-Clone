@@ -1,0 +1,48 @@
+// Okay, so we will go step wise now. Now what I need is, each step will be of atleast two parts, part one, you will give me task to be implemented and I will try to implement it on my own. Then below that you will give me steps to implement it. If I faced any difficulty then I will refer those steps and below that you will give me logic as well. So my skills will get improved. Part 2 will be of cross checking, once my code implementation is done you will show your code and we will discuss optimal code implementation by comparing both. Note in part one you will strictly not give me a single line of code, I will try to implement everything on my own. Lets start with step 1 now, we willcomplement small small micro tasks in each step..
+
+
+USE:
+const x = this.columns.getX(col);
+const y = this.rows.getY(row);
+const width = this.columns.getWidth(col);
+const height = this.rows.getHeight(row);
+INSTEAD OF:
+const x = col * CELL_WIDTH;
+const y = row * CELL_HEIGHT;
+const width = CELL_WIDTH;
+const height = CELL_HEIGHT;
+
+
+
+
+🔜 Future Steps (Column/Row Resizing Feature)
+Part 1 – Completed
+Detect edges for resizing using mousemove.
+Change cursor style using threshold detection logic.
+
+Part 2 – Next
+On pointerdown at resizable edge:
+Set resizingColIndex or resizingRowIndex.
+Record initial position and size.
+
+Part 3 – Dragging to Resize
+On pointermove, calculate deltaX or deltaY.
+Call column.resizeColumn(col, newWidth) or row.resizeRow(row, newHeight).
+
+Part 4 – Re-rendering
+After resizing, GridCanvas.render() will use new widths/heights from Column and Row classes for painting.
+
+Part 5 – Refactor Global Constants
+Remove from utils.js:
+
+js:
+export const TOTAL_ROWS = 100000;
+export const TOTAL_COLUMNS = 500;
+export const CELL_WIDTH = 100;
+export const CELL_HEIGHT = 25;
+Replace them throughout codebase with:
+
+js:
+column.getWidth(i), column.getX(i)
+row.getHeight(i), row.getY(i)
+column.totalColumns, row.totalRows

@@ -1,4 +1,4 @@
-import { getDpr, TOTAL_COLUMNS, TOTAL_ROWS } from "../utils/utils.js";
+import { getDpr } from "../utils/utils.js";
 
 export class SelectionManager {
   constructor(gridCanvas) {
@@ -11,24 +11,21 @@ export class SelectionManager {
     this.isSelecting = false;
   }
 
-  renderSelection(ctx, scrollLeft, scrollTop, cellWidth, cellHeight) {
+  renderSelection(ctx, columns, rows) {
     if (!this.anchorCell || !this.focusCell) return;
 
     const dpr = getDpr();
     const { startRow, endRow, startCol, endCol } = this.getSelectedRange();
 
-    // Already inside translate in gridCanvas
+    const borderX = columns.getX(startCol);
+    const borderY = rows.getY(startRow);
+    const borderW = columns.getX(endCol + 1) - borderX;
+    const borderH = rows.getY(endRow + 1) - borderY;
+
     ctx.save();
-
-    const borderX = startCol * cellWidth;
-    const borderY = startRow * cellHeight;
-    const borderW = (endCol - startCol + 1) * cellWidth;
-    const borderH = (endRow - startRow + 1) * cellHeight;
-
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
     ctx.strokeRect(borderX + 1, borderY + 1, borderW - 2, borderH - 2);
-
     ctx.restore();
   }
 
@@ -74,9 +71,7 @@ export class SelectionManager {
   }
 
   setSelectedCell(row, col) {
-    this.anchorCell = { row, col };
-    this.focusCell = { row, col };
-    this.selectedCell = { row, col };
+    this.setAnchorCell(row, col); // sets anchor, focus, and selected
     this.gridCanvas.render();
   }
 
@@ -89,11 +84,13 @@ export class SelectionManager {
   }
 
   isFullColumnSelection() {
+    const totalRows = this.gridCanvas.rows.heights.length;
+
     return (
       this.anchorCell &&
       this.focusCell &&
       this.anchorCell.row === 0 &&
-      this.focusCell.row === TOTAL_ROWS - 1
+      this.focusCell.row === totalRows - 1
     );
   }
 
@@ -106,11 +103,13 @@ export class SelectionManager {
   }
 
   isFullRowSelection() {
+    const totalCols = this.gridCanvas.columns.widths.length;
+
     return (
       this.anchorCell &&
       this.focusCell &&
       this.anchorCell.col === 0 &&
-      this.focusCell.col === TOTAL_COLUMNS - 1
+      this.focusCell.col === totalCols - 1
     );
   }
 

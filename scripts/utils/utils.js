@@ -1,37 +1,23 @@
-// GLOBAL DECLARATIONS
-export const TOTAL_ROWS = 100000;
-export const TOTAL_COLUMNS = 500;
-export const CELL_WIDTH = 100;
-export const CELL_HEIGHT = 25;
+// export const CELL_HEIGHT = 25;
+// export const CELL_WIDTH = 100;
+// export const TOTAL_COLUMNS = 500;
+// export const TOTAL_ROWS = 100000;
 
 // UTILITY FUNCTIONS
 /**
  * Returns the start/end row/column based on scroll
  */
-export function getVisibleRange(container) {
+export function getVisibleRange(container, columns, rows) {
   const scrollLeft = container.scrollLeft;
   const scrollTop = container.scrollTop;
   const viewWidth = container.clientWidth + 1;
   const viewHeight = container.clientHeight + 1;
 
-  const startCol = Math.floor(scrollLeft / CELL_WIDTH);
+  const startCol = columns.findColumnAtX(scrollLeft);
+  const endCol = columns.findColumnAtX(scrollLeft + viewWidth) + 1;
 
-  const endCol = Math.min(
-    TOTAL_COLUMNS,
-    startCol + Math.ceil(viewWidth / CELL_WIDTH) + 1
-  ); // const endCol = Math.min(
-  //   this.totalColumns,
-  //   Math.ceil((scrollLeft + viewWidth) / this.cellWidth)
-  // );
-  const startRow = Math.floor(scrollTop / CELL_HEIGHT);
-  const endRow = Math.min(
-    TOTAL_ROWS,
-    startRow + Math.ceil(viewHeight / CELL_HEIGHT) + 1
-  );
-  // const endRow = Math.min(
-  //   this.totalRows,
-  //   Math.ceil((scrollTop + viewHeight) / this.cellHeight)
-  // );
+  const startRow = rows.findRowAtY(scrollTop);
+  const endRow = rows.findRowAtY(scrollTop + viewHeight) + 1;
 
   return {
     scrollLeft,

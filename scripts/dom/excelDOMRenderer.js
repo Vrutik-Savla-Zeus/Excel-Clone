@@ -1,7 +1,8 @@
-import { CELL_HEIGHT, CELL_WIDTH } from "../utils/utils.js";
-
 export class ExcelDOMRenderer {
-  constructor() {
+  constructor(columns, rows) {
+    this.columns = columns;
+    this.rows = rows;
+
     this.container = this._createCanvasContainer();
     this.wrapper = this._createCanvasWrapper();
     this.cellInput = this._createInput();
@@ -37,9 +38,17 @@ export class ExcelDOMRenderer {
   getInputPosition(row, col) {
     const containerRect = this.container.getBoundingClientRect();
     const left =
-      col * CELL_WIDTH - this.container.scrollLeft + 50 + containerRect.left;
+      this.columns.getX(col) -
+      this.container.scrollLeft +
+      this.columns.getX(1) / 2 +
+      containerRect.left;
+
     const top =
-      row * CELL_HEIGHT - this.container.scrollTop + 25 + containerRect.top;
+      this.rows.getY(row) -
+      this.container.scrollTop +
+      this.rows.getY(1) +
+      containerRect.top;
+
     return { left, top };
   }
 }

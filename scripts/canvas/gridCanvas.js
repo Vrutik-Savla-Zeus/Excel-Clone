@@ -1,16 +1,8 @@
 import { SelectionManager } from "../selection/selectionManager.js";
-import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  getDpr,
-  getVisibleRange,
-  setupCanvas,
-  TOTAL_COLUMNS,
-  TOTAL_ROWS,
-} from "../utils/utils.js";
+import { getDpr, getVisibleRange, setupCanvas } from "../utils/utils.js";
 
 export class GridCanvas {
-  constructor(container, cellData) {
+  constructor(container, columns, rows, cellData) {
     this.container = container; // The outer scrollable div
 
     this.canvas = document.createElement("canvas");
@@ -18,10 +10,11 @@ export class GridCanvas {
     this.canvas.id = "gridCanvas";
     this.ctx = this.canvas.getContext("2d");
 
-    /** @type {SelectionManager} */
-    this.selectionManager = new SelectionManager(this);
-
+    this.columns = columns;
+    this.rows = rows;
     this.cellData = cellData;
+
+    this.selectionManager = new SelectionManager(this);
 
     this._init();
     this.render();
@@ -42,7 +35,7 @@ export class GridCanvas {
       endCol,
       startRow,
       endRow,
-    } = getVisibleRange(this.container);
+    } = getVisibleRange(this.container, this.columns, this.rows);
 
     setupCanvas(this.ctx, this.canvas, viewWidth, viewHeight);
     this.ctx.save();
@@ -54,44 +47,54 @@ export class GridCanvas {
 
       for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
-          const x = col * CELL_WIDTH;
-          const y = row * CELL_HEIGHT;
+          const x = this.columns.getX(col);
+          const y = this.rows.getY(row);
+          const width = this.columns.getWidth(col);
+          const height = this.rows.getHeight(row);
 
           this.ctx.fillStyle =
             row === this.selectionManager.anchorCell.row &&
             col === this.selectionManager.anchorCell.col
               ? "#fff"
               : "#d1f5d3";
-          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+          this.ctx.fillRect(x, y, width, height);
         }
       }
     }
 
+    // Full column selection
     if (this.selectionManager.isFullColumnSelection()) {
       const { startCol, endCol } =
         this.selectionManager.getSelectedColumnsRange();
 
       for (let col = startCol; col <= endCol; col++) {
+        const x = this.columns.getX(col);
+        const width = this.columns.getWidth(col);
+
         for (let row = startRow; row <= endRow; row++) {
-          const x = col * CELL_WIDTH;
-          const y = row * CELL_HEIGHT;
+          const y = this.rows.getY(row);
+          const height = this.rows.getHeight(row);
 
           this.ctx.fillStyle = "#d1f5d3";
-          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+          this.ctx.fillRect(x, y, width, height);
         }
       }
     }
 
+    // Full row selection
     if (this.selectionManager.isFullRowSelection()) {
       const { startRow, endRow } = this.selectionManager.getSelectedRowsRange();
 
       for (let col = startCol; col <= endCol; col++) {
+        const x = this.columns.getX(col);
+        const width = this.columns.getWidth(col);
+
         for (let row = startRow; row <= endRow; row++) {
-          const x = col * CELL_WIDTH;
-          const y = row * CELL_HEIGHT;
+          const y = this.rows.getY(row);
+          const height = this.rows.getHeight(row);
 
           this.ctx.fillStyle = "#d1f5d3";
-          this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+          this.ctx.fillRect(x, y, width, height);
         }
       }
     }
@@ -100,15 +103,19 @@ export class GridCanvas {
 
     // Horizontal lines
     for (let i = startRow; i <= endRow; i++) {
-      const y = i * CELL_HEIGHT + 0.5 / dpr;
-      this.ctx.moveTo(startCol * CELL_WIDTH, y);
-      this.ctx.lineTo(endCol * CELL_WIDTH, y);
+      const y = this.rows.getY(i) + 0.5 / dpr;
+      const xStart = this.columns.getX(startCol);
+      const xEnd = this.columns.getX(endCol + 1);
+      this.ctx.moveTo(xStart, y);
+      this.ctx.lineTo(xEnd, y);
     }
     // Vertical lines
     for (let j = startCol; j <= endCol; j++) {
-      const x = j * CELL_WIDTH + 0.5 / dpr;
-      this.ctx.moveTo(x, startRow * CELL_HEIGHT);
-      this.ctx.lineTo(x, endRow * CELL_HEIGHT);
+      const x = this.columns.getX(j) + 0.5 / dpr;
+      const yStart = this.rows.getY(startRow);
+      const yEnd = this.rows.getY(endRow + 1);
+      this.ctx.moveTo(x, yStart);
+      this.ctx.lineTo(x, yEnd);
     }
 
     this.ctx.strokeStyle = "#ccc";
@@ -116,19 +123,14 @@ export class GridCanvas {
     this.ctx.stroke();
 
     // Cell selection
-    this.selectionManager.renderSelection(
-      this.ctx,
-      scrollLeft,
-      scrollTop,
-      CELL_WIDTH,
-      CELL_HEIGHT
-    );
+    this.selectionManager.renderSelection(this.ctx, this.columns, this.rows);
 
     this.ctx.restore();
 
     // Fixed strokes: top and left border of viewport
-    const maxX = TOTAL_COLUMNS * CELL_WIDTH;
-    const maxY = TOTAL_ROWS * CELL_HEIGHT;
+
+    const maxX = this.columns.getTotalWidth();
+    const maxY = this.rows.getTotalHeight();
     this.ctx.beginPath();
     this.ctx.moveTo(0, 0);
     this.ctx.lineTo(Math.min(viewWidth, maxX), 0);

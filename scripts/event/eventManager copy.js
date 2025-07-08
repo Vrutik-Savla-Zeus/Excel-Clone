@@ -19,6 +19,7 @@ export class EventManager {
     columns,
     rows,
   }) {
+    // DOM elements and callbacks
     this.container = container;
     this.wrapper = wrapper;
     this.cellInput = cellInput;
@@ -30,26 +31,31 @@ export class EventManager {
     this.selectAllCanvas = selectAllCanvas;
     this.cellData = cellData;
 
+    // Editing state
     this.editingRow = null;
     this.editingCol = null;
 
+    // Double-click + drag tracking
     this.isDragging = false;
     this.isEditingAndDragging = false;
     this.dblClickAnchor = null;
     this.awaitingEditFromDblClick = false;
 
+    // For double-click detection
     this.lastClickTime = 0;
     this.lastClickCell = null;
 
+    // For all column and row selection
     this.isColumnSelecting = false;
     this.isRowSelecting = false;
     this.suppressNextClick = false;
 
+    // For column and row resizing
     this.columns = columns;
     this.rows = rows;
     this.edgeThreshold = 3;
     this.colResize = {
-      index: null,
+      header: null,
       startX: 0,
       startWidth: 0,
     };
@@ -58,11 +64,11 @@ export class EventManager {
       startY: 0,
       startHeight: 0,
     };
-    this.isResizing = false;
 
     this._init();
   }
 
+  /** Initializes all core event listeners */
   _init() {
     this._handleScroll();
     this._handleResize();
@@ -72,11 +78,13 @@ export class EventManager {
     this._handlePointerEvents();
   }
 
+  /** Sets the currently editing cell's coordinates */
   setEditingCell(row, col) {
     this.editingRow = row;
     this.editingCol = col;
   }
 
+  /** Adjusts input position on scroll */
   _handleScroll() {
     this.container.addEventListener("scroll", () => {
       if (
@@ -95,12 +103,19 @@ export class EventManager {
     });
   }
 
+  /** Rerenders grid on window resize */
   _handleResize() {
     window.addEventListener("resize", () => {
       requestAnimationFrame(() => this.render());
     });
   }
 
+  /**
+   * Handles all pointer events:
+   * - Single click: selection
+   * - Double-click: cell editing
+   * - Double-click + drag: selection + editing at anchor cell
+   */
   _handlePointerEvents() {
     const gridCanvasEl = document.getElementById("gridCanvas");
     let startX = 0,
@@ -108,12 +123,24 @@ export class EventManager {
       hasDragged = false;
 
     this.container.addEventListener("pointerdown", (e) => {
-      if (this.isResizing) return;
-
       hasDragged = false;
       this.isDragging = true;
 
       const rect = gridCanvasEl.getBoundingClientRect();
+
+      // GUARD CLAUSE: Check if the click was inside the canvas bounds (avoid scrollbar)
+      const canvasBounds = gridCanvasEl.getBoundingClientRect();
+      const xInCanvas = e.clientX - canvasBounds.left;
+      const yInCanvas = e.clientY - canvasBounds.top;
+      if (
+        xInCanvas < -this.columns.getWidth(0) / 2 ||
+        yInCanvas < -this.rows.getHeight(0) ||
+        xInCanvas > gridCanvasEl.clientWidth - this.columns.getWidth(0) ||
+        yInCanvas > gridCanvasEl.clientHeight - this.rows.getHeight(0)
+      ) {
+        return;
+      }
+
       const x = e.clientX - rect.left + this.container.scrollLeft;
       const y = e.clientY - rect.top + this.container.scrollTop;
 
@@ -122,9 +149,11 @@ export class EventManager {
 
       const col = this.columns.findColumnAtX(x);
       const row = this.rows.findRowAtY(y);
+      if (col == null && row == null) return;
 
-      // Column selection (header row click)
-      if (row === -1) {
+      // All column selection
+      const isHeaderClick = row === null || this.rows.getY(row) > y; // Above first row
+      if (isHeaderClick) {
         this.isColumnSelecting = true;
         this.gridCanvas.selectionManager.setAnchorCell(0, col);
         this.gridCanvas.selectionManager.setFocusCell(
@@ -143,20 +172,22 @@ export class EventManager {
           this.render();
         };
 
-        const onUp = () => {
+        const onUp = (e) => {
           this.isColumnSelecting = false;
-          this.suppressNextClick = true;
+          this.suppressNextClick = true; // prevent immediate click reset
           this.container.removeEventListener("pointermove", onMove);
           this.container.removeEventListener("pointerup", onUp);
         };
 
         this.container.addEventListener("pointermove", onMove);
         this.container.addEventListener("pointerup", onUp);
+
         return;
       }
 
-      // Row selection (index column click)
-      if (col === -1) {
+      // All row selection
+      const isIndexClick = col === null || this.columns.getX(col) > x; // Left of first column
+      if (isIndexClick) {
         this.isRowSelecting = true;
         this.gridCanvas.selectionManager.setAnchorCell(row, 0);
         this.gridCanvas.selectionManager.setFocusCell(
@@ -172,10 +203,11 @@ export class EventManager {
             moveRow,
             this.columns.totalColumns - 1
           );
+
           this.render();
         };
 
-        const onUp = () => {
+        const onUp = (e) => {
           this.isRowSelecting = false;
           this.suppressNextClick = true;
           this.container.removeEventListener("pointermove", onMove);
@@ -184,10 +216,11 @@ export class EventManager {
 
         this.container.addEventListener("pointermove", onMove);
         this.container.addEventListener("pointerup", onUp);
+
         return;
       }
 
-      // Double-click detection
+      // Double-click detection based on time and cell location
       const now = Date.now();
       const isSameCell =
         this.lastClickCell &&
@@ -226,6 +259,7 @@ export class EventManager {
       };
 
       const onUp = () => {
+        // If double-click + drag occurred, enter editing mode on anchor cell
         if (
           this.isEditingAndDragging &&
           this.awaitingEditFromDblClick &&
@@ -238,6 +272,7 @@ export class EventManager {
         this.isDragging = false;
         this.isEditingAndDragging = false;
         this.awaitingEditFromDblClick = false;
+        // this.dblClickAnchor = null;
 
         this.render();
         this.container.removeEventListener("pointermove", onMove);
@@ -255,11 +290,10 @@ export class EventManager {
         this.isRowSelecting ||
         this.suppressNextClick
       ) {
-        e.preventDefault();
+        e.preventDefault(); // Prevent post-drag click
         this.suppressNextClick = false;
         return;
       }
-
       const rect = gridCanvasEl.getBoundingClientRect();
       const x = e.clientX - rect.left + this.container.scrollLeft;
       const y = e.clientY - rect.top + this.container.scrollTop;
@@ -272,9 +306,14 @@ export class EventManager {
     });
   }
 
+  /**
+   * Begins cell editing at given row and col:
+   * shows input, sets style, loads value, attaches listeners.
+   */
   _startEditing(row, col) {
     const dpr = getDpr();
     this.setEditingCell(row, col);
+
     const position = this.getInputPosition(row, col);
 
     this.cellInput.style.display = "block";
@@ -287,17 +326,22 @@ export class EventManager {
     this.cellInput.focus();
 
     const finishEdit = () => {
+      const { row, col } = this.dblClickAnchor;
+      if (row == null || col == null) return;
+
+      this.gridCanvas.selectionManager.setSelectedCell(row, col);
+
       const value = this.cellInput.value.trim();
       this.cellData.setCellData(row, col, value);
       this.cellInput.style.display = "none";
       this.setEditingCell(null, null);
-      this.gridCanvas.selectionManager.setSelectedCell(row, col);
       this.render();
     };
 
     this.cellInput.onkeydown = (event) => {
       if (event.key === "Enter") finishEdit();
     };
+
     this.cellInput.onblur = finishEdit;
   }
 
@@ -307,6 +351,7 @@ export class EventManager {
 
       const headerRect = this.headerCanvas.canvas.getBoundingClientRect();
       const indexRect = this.indexCanvas.canvas.getBoundingClientRect();
+      const selectAllRect = this.selectAllCanvas.canvas.getBoundingClientRect();
 
       const inHeader =
         e.clientX >= headerRect.left + this.edgeThreshold &&
@@ -320,6 +365,19 @@ export class EventManager {
         e.clientY >= indexRect.top + this.edgeThreshold &&
         e.clientY <= indexRect.bottom;
 
+      const inSelectAll =
+        e.clientX >= selectAllRect.left &&
+        e.clientX <= selectAllRect.right &&
+        e.clientY >= selectAllRect.top &&
+        e.clientY <= selectAllRect.bottom;
+
+      // 🟥 Top-left corner: "cell" cursor only
+      if (inSelectAll) {
+        this.wrapper.style.cursor = "cell";
+        return;
+      }
+
+      // Header area (horizontal resizing)
       if (inHeader) {
         const x = e.clientX - headerRect.left + this.container.scrollLeft;
         const col = this.columns.findColumnAtX(x);
@@ -335,6 +393,7 @@ export class EventManager {
         }
       }
 
+      // Index area (vertical resizing)
       if (inIndex) {
         const y = e.clientY - indexRect.top + this.container.scrollTop;
         const row = this.rows.findRowAtY(y);
@@ -350,6 +409,7 @@ export class EventManager {
         }
       }
 
+      // Default fallback
       this.wrapper.style.cursor = "cell";
     });
   }
@@ -358,23 +418,26 @@ export class EventManager {
     this.container.addEventListener("pointerdown", (e) => {
       const headerRect = this.headerCanvas.canvas.getBoundingClientRect();
       const indexRect = this.indexCanvas.canvas.getBoundingClientRect();
+
       const scrollLeft = this.container.scrollLeft;
       const scrollTop = this.container.scrollTop;
 
+      // Column resize detection
       const xInHeader = e.clientX - headerRect.left;
-      const yInIndex = e.clientY - indexRect.top;
+      const yInHeader = e.clientY - headerRect.top;
 
-      let resizing = false;
-
-      // COLUMN RESIZE
       if (
         e.clientY >= headerRect.top &&
         e.clientY <= headerRect.bottom &&
-        xInHeader >= 0
+        xInHeader >= 0 &&
+        xInHeader <= headerRect.width
       ) {
         const x = xInHeader + scrollLeft;
         const col = this.columns.findColumnAtX(x);
-        const colRight = this.columns.getX(col) + this.columns.getWidth(col);
+        // if (col === -1 || col === null) return; // Early return on invalid hit
+
+        const colLeft = this.columns.getX(col);
+        const colRight = colLeft + this.columns.getWidth(col);
 
         if (Math.abs(x - colRight) <= this.edgeThreshold) {
           this.colResize = {
@@ -382,19 +445,25 @@ export class EventManager {
             startX: e.clientX,
             startWidth: this.columns.getWidth(col),
           };
-          resizing = true;
         }
       }
 
-      // ROW RESIZE
+      // Row Resize Detection
+      const xInIndex = e.clientX - indexRect.left;
+      const yInIndex = e.clientY - indexRect.top;
+
       if (
         e.clientX >= indexRect.left &&
         e.clientX <= indexRect.right &&
-        yInIndex >= 0
+        yInIndex >= 0 &&
+        yInIndex <= indexRect.height
       ) {
         const y = yInIndex + scrollTop;
         const row = this.rows.findRowAtY(y);
-        const rowBottom = this.rows.getY(row) + this.rows.getHeight(row);
+        // if (row === -1 || row == null) return; // Early return on invalid hit
+
+        const rowTop = this.rows.getY(row);
+        const rowBottom = rowTop + this.rows.getHeight(row);
 
         if (Math.abs(y - rowBottom) <= this.edgeThreshold) {
           this.rowResize = {
@@ -402,58 +471,27 @@ export class EventManager {
             startY: e.clientY,
             startHeight: this.rows.getHeight(row),
           };
-          resizing = true;
         }
-      }
-
-      // Only attach drag if resizing was detected
-      if (resizing) {
-        this.isResizing = true;
-
-        const onMove = (e) => {
-          if (this.colResize.index !== null) {
-            const dx = e.clientX - this.colResize.startX;
-            const newWidth = Math.max(20, this.colResize.startWidth + dx);
-            this.columns.resizeColumn(this.colResize.index, newWidth);
-          }
-
-          if (this.rowResize.index !== null) {
-            const dy = e.clientY - this.rowResize.startY;
-            const newHeight = Math.max(20, this.rowResize.startHeight + dy);
-            this.rows.resizeRow(this.rowResize.index, newHeight);
-          }
-
-          this.render();
-        };
-
-        const onUp = () => {
-          this.colResize.index = null;
-          this.rowResize.index = null;
-          this.isResizing = false;
-          this.container.removeEventListener("pointermove", onMove);
-          this.container.removeEventListener("pointerup", onUp);
-        };
-
-        this.container.addEventListener("pointermove", onMove);
-        this.container.addEventListener("pointerup", onUp);
       }
     });
   }
 
   _handleResizeDrag() {
     const onMove = (e) => {
+      // Column Resizing
       if (this.colResize.index !== null) {
         const dx = e.clientX - this.colResize.startX;
         const newWidth = Math.max(20, this.colResize.startWidth + dx);
         this.columns.resizeColumn(this.colResize.index, newWidth);
-        this.render();
+        this.render(); // Re-render affected canvas
       }
 
+      // Row Resizing
       if (this.rowResize.index !== null) {
         const dy = e.clientY - this.rowResize.startY;
         const newHeight = Math.max(20, this.rowResize.startHeight + dy);
         this.rows.resizeRow(this.rowResize.index, newHeight);
-        this.render();
+        this.render(); // Re-render affected canvas
       }
     };
 

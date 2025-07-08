@@ -1,14 +1,10 @@
-import {
-  CELL_HEIGHT,
-  cellStyle,
-  getDpr,
-  getVisibleRange,
-  setupCanvas,
-} from "../utils/utils.js";
+import { setupCanvas } from "../utils/utils.js";
 
 export class SelectAllCanvas {
-  constructor(container) {
+  constructor(container, columns, rows) {
     this.container = container;
+    this.columns = columns;
+    this.rows = rows;
 
     this.canvas = document.createElement("canvas");
     this.canvas.className = "select-all-canvas";
@@ -26,8 +22,8 @@ export class SelectAllCanvas {
    * Renders Top Left corner of grid
    */
   render() {
-    const width = 50;
-    const height = 25;
+    const width = this.columns.getX(1) / 2;
+    const height = this.rows.getY(1);
 
     setupCanvas(this.ctx, this.canvas, width, height);
     this.ctx.fillStyle = "#f3f3f3";

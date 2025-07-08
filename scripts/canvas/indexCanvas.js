@@ -1,6 +1,4 @@
 import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
   cellStyle,
   getDpr,
   getVisibleRange,
@@ -8,8 +6,10 @@ import {
 } from "../utils/utils.js";
 
 export class IndexCanvas {
-  constructor(container, selectionManager) {
+  constructor(container, columns, rows, selectionManager) {
     this.container = container;
+    this.columns = columns;
+    this.rows = rows;
     this.selectionManager = selectionManager;
 
     this.canvas = document.createElement("canvas");
@@ -31,14 +31,17 @@ export class IndexCanvas {
     const dpr = getDpr();
     const indexWidth = 50;
     const { scrollTop, viewHeight, startRow, endRow } = getVisibleRange(
-      this.container
+      this.container,
+      this.columns,
+      this.rows
     );
     setupCanvas(this.ctx, this.canvas, indexWidth, viewHeight);
 
     const selectedRange = this.selectionManager.getSelectedRange();
 
     for (let i = startRow; i < endRow; i++) {
-      const y = i * CELL_HEIGHT - scrollTop;
+      const y = this.rows.getY(i) - scrollTop;
+      const height = this.rows.getHeight(i);
       const isSelected =
         selectedRange &&
         i >= selectedRange.startRow &&
@@ -46,21 +49,21 @@ export class IndexCanvas {
 
       if (isSelected) {
         this.ctx.fillStyle = "#d1ffd1"; // light green
-        this.ctx.fillRect(0, y, indexWidth, CELL_HEIGHT);
+        this.ctx.fillRect(0, y, indexWidth, height);
       } else {
         this.ctx.fillStyle = "#f3f3f3"; // default
-        this.ctx.fillRect(0, y, indexWidth, CELL_HEIGHT);
+        this.ctx.fillRect(0, y, indexWidth, height);
       }
 
       // Text
       cellStyle(this.ctx, 12, "Arial", "center", "middle", "#111");
-      this.ctx.fillText(i + 1, indexWidth / 2, y + CELL_HEIGHT / 2);
+      this.ctx.fillText(i + 1, indexWidth / 2, y + height / 2);
 
       // Border for selected row
       if (isSelected) {
         this.ctx.beginPath();
         this.ctx.moveTo(indexWidth - 1 / dpr, y);
-        this.ctx.lineTo(indexWidth - 1 / dpr, y + CELL_HEIGHT);
+        this.ctx.lineTo(indexWidth - 1 / dpr, y + height);
         this.ctx.strokeStyle = "#008000";
         this.ctx.lineWidth = 2 / dpr;
         this.ctx.stroke();
@@ -72,15 +75,15 @@ export class IndexCanvas {
       const { startRow, endRow } = this.selectionManager.getSelectedRowsRange();
 
       for (let row = startRow; row <= endRow; row++) {
-        const x = 0;
-        const y = row * CELL_HEIGHT - scrollTop;
+        const y = this.rows.getY(row) - scrollTop;
+        const height = this.rows.getHeight(row);
 
         this.ctx.fillStyle = "#007b3e";
-        this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        this.ctx.fillRect(0, y, indexWidth, height);
 
         // Draw index label again
         cellStyle(this.ctx, 12, "Arial", "center", "middle", "#fff", true);
-        this.ctx.fillText(row + 1, indexWidth / 2, y + CELL_HEIGHT / 2);
+        this.ctx.fillText(row + 1, indexWidth / 2, y + height / 2);
       }
     }
 
@@ -89,7 +92,7 @@ export class IndexCanvas {
     this.ctx.beginPath();
 
     for (let i = startRow; i <= endRow; i++) {
-      const y = i * CELL_HEIGHT - scrollTop + 0.5 / dpr;
+      const y = this.rows.getY(i) - scrollTop + 0.5 / dpr;
       this.ctx.moveTo(0, y);
       this.ctx.lineTo(indexWidth, y);
     }

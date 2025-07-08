@@ -1,6 +1,4 @@
 import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
   cellStyle,
   getColumnLabel,
   getDpr,
@@ -9,8 +7,10 @@ import {
 } from "../utils/utils.js";
 
 export class HeaderCanvas {
-  constructor(container, selectionManager) {
+  constructor(container, columns, rows, selectionManager) {
     this.container = container;
+    this.columns = columns;
+    this.rows = rows;
     this.selectionManager = selectionManager;
 
     this.canvas = document.createElement("canvas");
@@ -31,14 +31,19 @@ export class HeaderCanvas {
   render() {
     const dpr = getDpr();
     const { scrollLeft, viewWidth, startCol, endCol } = getVisibleRange(
-      this.container
+      this.container,
+      this.columns,
+      this.rows
     );
-    setupCanvas(this.ctx, this.canvas, viewWidth, CELL_HEIGHT);
+
+    const headerHeight = this.rows.getHeight(0); // Using first row's height as header height
+    setupCanvas(this.ctx, this.canvas, viewWidth, headerHeight);
 
     const selectedRange = this.selectionManager.getSelectedRange();
 
     for (let j = startCol; j < endCol; j++) {
-      const x = j * CELL_WIDTH - scrollLeft;
+      const x = this.columns.getX(j) - scrollLeft;
+      const width = this.columns.getWidth(j);
       const isSelected =
         selectedRange &&
         j >= selectedRange.startCol &&
@@ -46,18 +51,18 @@ export class HeaderCanvas {
 
       // Background
       this.ctx.fillStyle = isSelected ? "#d1ffd1" : "#f3f3f3";
-      this.ctx.fillRect(x, 0, CELL_WIDTH, CELL_HEIGHT);
+      this.ctx.fillRect(x, 0, width, headerHeight);
 
       // Label
       const label = getColumnLabel(j);
       cellStyle(this.ctx, 12, "Arial", "center", "middle", "#111");
-      this.ctx.fillText(label, x + CELL_WIDTH / 2, CELL_HEIGHT / 2);
+      this.ctx.fillText(label, x + width / 2, headerHeight / 2);
 
       // Bottom border if selected
       if (isSelected) {
         this.ctx.beginPath();
-        this.ctx.moveTo(x, CELL_HEIGHT - 1 / dpr);
-        this.ctx.lineTo(x + CELL_WIDTH, CELL_HEIGHT - 1 / dpr);
+        this.ctx.moveTo(x, headerHeight - 1 / dpr);
+        this.ctx.lineTo(x + width, headerHeight - 1 / dpr);
         this.ctx.strokeStyle = "#008000";
         this.ctx.lineWidth = 2 / dpr;
         this.ctx.stroke();
@@ -70,16 +75,16 @@ export class HeaderCanvas {
         this.selectionManager.getSelectedColumnsRange();
 
       for (let col = startCol; col <= endCol; col++) {
-        const x = col * CELL_WIDTH - scrollLeft;
-        const y = 0;
+        const x = this.columns.getX(col) - scrollLeft;
+        const width = this.columns.getWidth(col);
 
         this.ctx.fillStyle = "#007b3e"; // dark green
-        this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
+        this.ctx.fillRect(x, 0, width, headerHeight);
 
         // Draw header label again
         const label = getColumnLabel(col);
         cellStyle(this.ctx, 12, "Arial", "center", "middle", "#fff", true);
-        this.ctx.fillText(label, x + CELL_WIDTH / 2, CELL_HEIGHT / 2);
+        this.ctx.fillText(label, x + width / 2, headerHeight / 2);
       }
     }
 
@@ -88,12 +93,12 @@ export class HeaderCanvas {
     this.ctx.beginPath();
 
     for (let j = startCol; j <= endCol; j++) {
-      const x = j * CELL_WIDTH - scrollLeft + 0.5 / dpr;
+      const x = this.columns.getX(j) - scrollLeft + 0.5 / dpr;
       this.ctx.moveTo(x, 0);
-      this.ctx.lineTo(x, CELL_HEIGHT);
+      this.ctx.lineTo(x, headerHeight);
     }
     this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(0, CELL_HEIGHT);
+    this.ctx.lineTo(0, headerHeight);
 
     this.ctx.strokeStyle = "#ccc";
     this.ctx.lineWidth = 1 / dpr;

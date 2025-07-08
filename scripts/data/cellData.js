@@ -1,8 +1,10 @@
-import { CELL_HEIGHT, CELL_WIDTH, cellStyle } from "../utils/utils.js";
+import { cellStyle } from "../utils/utils.js";
 
 export class CellData {
-  constructor() {
+  constructor(columns, rows) {
     this.data = {};
+    this.columns = columns;
+    this.rows = rows;
   }
 
   /**
@@ -30,8 +32,9 @@ export class CellData {
         const { value, bold, italic } = cell;
         cellStyle(ctx, 14, "Arial", "left", "middle", "#111", bold, italic);
 
-        const x = col * CELL_WIDTH - scrollLeft + 2;
-        const y = row * CELL_HEIGHT - scrollTop + CELL_HEIGHT / 2 + 2;
+        const x = this.columns.getX(col) - scrollLeft + 2;
+        const y =
+          this.rows.getY(row) - scrollTop + this.rows.getHeight(row) / 2 + 2;
         ctx.fillText(value, x, y);
       }
     }
@@ -61,19 +64,19 @@ export class CellData {
 
   async loadFromJSON(jsonArray) {
     this.jsonRaw = jsonArray; // Store raw JSON for later access
-    this.columns = Object.keys(jsonArray[0]);
+    this.headers = Object.keys(jsonArray[0]);
 
     // Load only visible data (initial ~50 rows)
     const INITIAL_ROWS = 100;
 
-    for (let i = 0; i < this.columns.length; i++) {
-      this.setCellData(0, i, this.columns[i]); // header
+    for (let i = 0; i < this.headers.length; i++) {
+      this.setCellData(0, i, this.headers[i]); // header
     }
 
     for (let row = 0; row < INITIAL_ROWS; row++) {
       const data = jsonArray[row];
-      for (let col = 0; col < this.columns.length; col++) {
-        const value = data[this.columns[col]];
+      for (let col = 0; col < this.headers.length; col++) {
+        const value = data[this.headers[col]];
         this.setCellData(row + 1, col, value);
       }
     }
@@ -82,8 +85,8 @@ export class CellData {
     requestIdleCallback(() => {
       for (let row = INITIAL_ROWS; row < jsonArray.length; row++) {
         const data = jsonArray[row];
-        for (let col = 0; col < this.columns.length; col++) {
-          const value = data[this.columns[col]];
+        for (let col = 0; col < this.headers.length; col++) {
+          const value = data[this.headers[col]];
           this.setCellData(row + 1, col, value);
         }
       }
