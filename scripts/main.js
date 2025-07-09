@@ -9,7 +9,7 @@ import { HeaderCanvas } from "./canvas/headerCanvas.js";
 import { IndexCanvas } from "./canvas/indexCanvas.js";
 import { SelectAllCanvas } from "./canvas/selectAllCanvas.js";
 
-import { fetchData } from "./utils/utils.js";
+import { fetchData, resizeWrapper } from "./utils/utils.js";
 
 // 1. DOM Setup
 const columns = new Column();
@@ -20,8 +20,7 @@ const dom = new ExcelDOMRenderer(columns, rows);
 const cellData = new CellData(columns, rows);
 
 // 3. Set wrapper size
-dom.wrapper.style.width = `${columns.getTotalWidth() + columns.getX(1) / 2}px`;
-dom.wrapper.style.height = `${rows.getTotalHeight() + rows.getY(1)}px`;
+resizeWrapper(dom.wrapper, columns, rows);
 
 // 4. Canvas Instantiation
 const gridCanvas = new GridCanvas(dom.container, columns, rows, cellData);
@@ -41,6 +40,7 @@ const selectAllCanvas = new SelectAllCanvas(dom.container, columns, rows);
 
 // 5. Render Method
 function render() {
+  resizeWrapper(dom.wrapper, columns, rows);
   gridCanvas.render();
   headerCanvas.render();
   indexCanvas.render();
@@ -66,6 +66,6 @@ const eventManager = new EventManager({
 // 7. Initial Render
 render();
 await fetchData("../../data/data.json", cellData);
-gridCanvas.render();
+render();
 // console.log(columns.getWidth(0));
 // console.log(rows.getHeight(0));

@@ -1,8 +1,3 @@
-// export const CELL_HEIGHT = 25;
-// export const CELL_WIDTH = 100;
-// export const TOTAL_COLUMNS = 500;
-// export const TOTAL_ROWS = 100000;
-
 // UTILITY FUNCTIONS
 /**
  * Returns the start/end row/column based on scroll
@@ -110,4 +105,9 @@ export async function fetchData(path, cellDataInstance) {
   } catch (error) {
     console.error(`Error fetching in JSON data: ${error}`);
   }
+}
+
+export function resizeWrapper(wrapper, columns, rows) {
+  wrapper.style.width = `${columns.getTotalWidth()}px`;
+  wrapper.style.height = `${rows.getTotalHeight()}px`;
 }
