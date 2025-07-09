@@ -1,4 +1,8 @@
+import { TouchManager } from "./touchManager.js";
+import { ColumnResize } from "./columnResize.js";
+
 import { getDpr } from "../utils/utils.js";
+import { RowResize } from "./rowResize.js";
 
 /**
  * Manages events (scroll, resize, pointer) for grid interaction,
@@ -66,10 +70,36 @@ export class EventManager {
   _init() {
     this._handleScroll();
     this._handleResize();
-    this._handleResizeHover();
-    this._handleResizeStart();
-    this._handleResizeDrag();
+    // this._handleResizeHover();
+    // this._handleResizeStart();
+    // this._handleResizeDrag();
     this._handlePointerEvents();
+
+    this.touchManager = new TouchManager(this.container, this.wrapper);
+
+    this.touchManager.registerHandler(
+      new ColumnResize({
+        container: this.container,
+        wrapper: this.wrapper,
+        headerCanvas: this.headerCanvas,
+        columns: this.columns,
+        rows: this.rows,
+        render: this.render,
+        edgeThreshold: 3,
+      })
+    );
+
+    this.touchManager.registerHandler(
+      new RowResize({
+        container: this.container,
+        wrapper: this.wrapper,
+        indexCanvas: this.indexCanvas,
+        columns: this.columns,
+        rows: this.rows,
+        render: this.render,
+        edgeThreshold: 3,
+      })
+    );
   }
 
   setEditingCell(row, col) {
@@ -309,7 +339,7 @@ export class EventManager {
       const indexRect = this.indexCanvas.canvas.getBoundingClientRect();
 
       const inHeader =
-        e.clientX >= headerRect.left + this.edgeThreshold &&
+        e.clientX > headerRect.left + this.edgeThreshold &&
         e.clientX <= headerRect.right &&
         e.clientY >= headerRect.top &&
         e.clientY <= headerRect.bottom;
@@ -317,7 +347,7 @@ export class EventManager {
       const inIndex =
         e.clientX >= indexRect.left &&
         e.clientX <= indexRect.right &&
-        e.clientY >= indexRect.top + this.edgeThreshold &&
+        e.clientY > indexRect.top + this.edgeThreshold &&
         e.clientY <= indexRect.bottom;
 
       if (inHeader) {
