@@ -67,5 +67,3 @@ const eventManager = new EventManager({
 render();
 await fetchData("../../data/data.json", cellData);
 render();
-// console.log(columns.getWidth(0));
-// console.log(rows.getHeight(0));
