@@ -41,7 +41,7 @@ export class HeaderCanvas {
 
     const selectedRange = this.selectionManager.getSelectedRange();
 
-    for (let j = startCol; j < endCol; j++) {
+    for (let j = startCol; j <= endCol; j++) {
       const x = this.columns.getX(j) - scrollLeft;
       const width = this.columns.getWidth(j);
       const isSelected =

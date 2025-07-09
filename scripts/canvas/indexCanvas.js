@@ -39,7 +39,7 @@ export class IndexCanvas {
 
     const selectedRange = this.selectionManager.getSelectedRange();
 
-    for (let i = startRow; i < endRow; i++) {
+    for (let i = startRow; i <= endRow; i++) {
       const y = this.rows.getY(i) - scrollTop;
       const height = this.rows.getHeight(i);
       const isSelected =

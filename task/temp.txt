@@ -1,48 +1,31 @@
 // Okay, so we will go step wise now. Now what I need is, each step will be of atleast two parts, part one, you will give me task to be implemented and I will try to implement it on my own. Then below that you will give me steps to implement it. If I faced any difficulty then I will refer those steps and below that you will give me logic as well. So my skills will get improved. Part 2 will be of cross checking, once my code implementation is done you will show your code and we will discuss optimal code implementation by comparing both. Note in part one you will strictly not give me a single line of code, I will try to implement everything on my own. Lets start with step 1 now, we willcomplement small small micro tasks in each step..
 
+5 classes
+each contain 4 func - hitTest pointer down , move , up
+6th class- touch manager- contains event listeners, func register handlers, members-array of handlers and current handler= null
+ 
+touch.registerhandler(new rowSelection()) x 4
+ 
+onpointerdown
+ 
+{
+if(this.currentHandler!==null) 
+{
+this.currenthandler.onPOinterdown(e)
+}
+ 
+onpointermove(e, ()=>{
+	if(this.currentHandler!==null) 
+{
+this.currenthandler.onPOintermove(e)
+}
+})
+ 
+ISSUES:
+2. On resizing row, when i resize 1st row then my header is resizing instead of 1st row.
+3. on resizing row or column, my wrapper should also get increase so that I can scroll till last cells of bottom and right (currently not able to scroll till last cell when once column of row size gets altered).
+4. Silimarly when cell gets shrinked that is when row or column resizes down then also wrapper should get decrease otherwise will create white space at extremes.
+5. When resizing if I am at right edge og column then previous column should resizeand with row, if i am at top of cell then previous cell should resize (the above one).
 
-USE:
-const x = this.columns.getX(col);
-const y = this.rows.getY(row);
-const width = this.columns.getWidth(col);
-const height = this.rows.getHeight(row);
-INSTEAD OF:
-const x = col * CELL_WIDTH;
-const y = row * CELL_HEIGHT;
-const width = CELL_WIDTH;
-const height = CELL_HEIGHT;
+We will fix these in promptwise, per issue one prompt...
 
-
-
-
-🔜 Future Steps (Column/Row Resizing Feature)
-Part 1 – Completed
-Detect edges for resizing using mousemove.
-Change cursor style using threshold detection logic.
-
-Part 2 – Next
-On pointerdown at resizable edge:
-Set resizingColIndex or resizingRowIndex.
-Record initial position and size.
-
-Part 3 – Dragging to Resize
-On pointermove, calculate deltaX or deltaY.
-Call column.resizeColumn(col, newWidth) or row.resizeRow(row, newHeight).
-
-Part 4 – Re-rendering
-After resizing, GridCanvas.render() will use new widths/heights from Column and Row classes for painting.
-
-Part 5 – Refactor Global Constants
-Remove from utils.js:
-
-js:
-export const TOTAL_ROWS = 100000;
-export const TOTAL_COLUMNS = 500;
-export const CELL_WIDTH = 100;
-export const CELL_HEIGHT = 25;
-Replace them throughout codebase with:
-
-js:
-column.getWidth(i), column.getX(i)
-row.getHeight(i), row.getY(i)
-column.totalColumns, row.totalRows
