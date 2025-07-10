@@ -32,11 +32,23 @@ export class CellData {
         const { value, bold, italic } = cell;
         cellStyle(ctx, 14, "Arial", "left", "middle", "#111", bold, italic);
 
-        const x = this.columns.getX(col) - scrollLeft + 2;
-        const y =
-          this.rows.getY(row) - scrollTop + this.rows.getHeight(row) / 2 + 2;
-        // console.log(value.toString().slice(0, 4));
-        ctx.fillText(value, x, y);
+        const cellX = this.columns.getX(col) - scrollLeft;
+        const cellY = this.rows.getY(row) - scrollTop;
+        const cellWidth = this.columns.getWidth(col);
+        const cellHeight = this.rows.getHeight(row);
+
+        const x = cellX + 4;
+        const y = cellY + cellHeight / 2 + 1;
+
+        let displayValue = value;
+        const padding = 6;
+        const maxWidth = cellWidth - padding;
+
+        if (ctx.measureText(value).width > maxWidth) {
+          displayValue = this._truncateText(ctx, value, maxWidth);
+        }
+
+        ctx.fillText(displayValue, x, y);
       }
     }
   }
@@ -68,13 +80,13 @@ export class CellData {
     this.headers = Object.keys(jsonArray[0]);
 
     // Load only visible data (initial ~50 rows)
-    const INITIAL_ROWS = 100;
+    const initialRows = 100;
 
     for (let i = 0; i < this.headers.length; i++) {
       this.setCellData(0, i, this.headers[i]); // header
     }
 
-    for (let row = 0; row < INITIAL_ROWS; row++) {
+    for (let row = 0; row < initialRows; row++) {
       const data = jsonArray[row];
       for (let col = 0; col < this.headers.length; col++) {
         const value = data[this.headers[col]];
@@ -84,7 +96,7 @@ export class CellData {
 
     // Optional: Queue the rest for background loading
     requestIdleCallback(() => {
-      for (let row = INITIAL_ROWS; row < jsonArray.length; row++) {
+      for (let row = initialRows; row < jsonArray.length; row++) {
         const data = jsonArray[row];
         for (let col = 0; col < this.headers.length; col++) {
           const value = data[this.headers[col]];
@@ -92,5 +104,18 @@ export class CellData {
         }
       }
     });
+  }
+
+  _truncateText(ctx, text, maxWidth) {
+    for (let i = 0; i < text.length; i++) {
+      const substr = text.slice(0, i + 1);
+      const width = ctx.measureText(substr).width;
+
+      if (width > maxWidth) {
+        return text.slice(0, i);
+      }
+    }
+
+    return text;
   }
 }
