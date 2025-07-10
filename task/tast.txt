@@ -77,20 +77,21 @@ FEATURES:
 10. Multi cell selection (COMPLETED)
 11. All rows selection (COMPLETED)
 12. All columns selection (COMPLETED)
-7. Data load from any json file
-
-16. Row resizing (IN PROGRESS) 
-17. Column resizing (IN PROGRESS)
+16. Row resizing (COMPLETED) 
+17. Column resizing (COMPLETED)
+7. Data load from any json file (COMPLETED)
 
 8. Data load from any csv file
 9. Json to csv csv to json download
 
+24. Excel header
+22. Compute count, min, max, sum and average of selected cells if they have numbers.
+19. Insert new row (+1 up and +1 down)
+20. Insert new column (+1 left and +1 right)
 23. Undo and Redo
+
 13. Multiple cell selection (ctrl button)
 14. Select rows through mouse and keyboard
 15. Select columns through mouse and keyboard
 18. Cell draging (replacing cells (drag and drop))
-19. Insert new row (+1 up and +1 down)
-20. Insert new column (+1 left and +1 right)
 21. Bold and italic feature in cell input and cell editing
-22. Compute count, min, max, sum and average of selected cells if they have numbers.

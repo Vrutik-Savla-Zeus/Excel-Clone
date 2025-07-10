@@ -39,16 +39,6 @@ export class EventManager {
   }
 
   _init() {
-    handleScroll(
-      this.container,
-      this.getInputPosition,
-      this.cellInput,
-      this.editingRow,
-      this.editingCol,
-      this.render
-    );
-    handleResize(this.render);
-
     this.touchManager = new TouchManager(this.container);
 
     this.touchManager.registerHandler(
@@ -110,5 +100,16 @@ export class EventManager {
         cellData: this.cellData,
       })
     );
+
+    handleScroll(
+      this.container,
+      this.getInputPosition,
+      this.cellInput,
+      this.editingRow,
+      this.editingCol,
+      this.render
+    );
+
+    handleResize(this.render);
   }
 }
