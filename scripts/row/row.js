@@ -1,5 +1,5 @@
 export class Row {
-  constructor(totalRows = 100000, cellHeight = 25) {
+  constructor(totalRows, cellHeight) {
     this.totalRows = totalRows;
     this.heights = new Array(totalRows).fill(cellHeight);
     this.positions = new Array(totalRows + 1).fill(0); // Prefix sum array

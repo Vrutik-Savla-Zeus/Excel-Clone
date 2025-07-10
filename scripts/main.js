@@ -12,8 +12,8 @@ import { SelectAllCanvas } from "./canvas/selectAllCanvas.js";
 import { fetchData, resizeWrapper } from "./utils/utils.js";
 
 // 1. DOM Setup
-const columns = new Column();
-const rows = new Row();
+const columns = new Column(500, 100);
+const rows = new Row(100000, 25);
 const dom = new ExcelDOMRenderer(columns, rows);
 
 // 2. Cell Data Setup

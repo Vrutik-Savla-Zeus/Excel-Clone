@@ -1,5 +1,5 @@
 export class Column {
-  constructor(totalColumns = 500, cellWidth = 100) {
+  constructor(totalColumns, cellWidth) {
     this.totalColumns = totalColumns;
     this.widths = new Array(totalColumns).fill(cellWidth);
     this.positions = new Array(totalColumns + 1).fill(0); // Prefix sum array

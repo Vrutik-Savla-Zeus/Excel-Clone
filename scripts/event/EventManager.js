@@ -39,7 +39,14 @@ export class EventManager {
   }
 
   _init() {
-    handleScroll(this.container, this.cellInput, this.render);
+    handleScroll(
+      this.container,
+      this.getInputPosition,
+      this.cellInput,
+      this.editingRow,
+      this.editingCol,
+      this.render
+    );
     handleResize(this.render);
 
     this.touchManager = new TouchManager(this.container);
