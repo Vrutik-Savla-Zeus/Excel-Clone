@@ -36,7 +36,7 @@ export class HeaderCanvas {
       this.rows
     );
 
-    const headerHeight = this.rows.getHeight(0); // Using first row's height as header height
+    const headerHeight = 25; // Using first row's height as header height
     setupCanvas(this.ctx, this.canvas, viewWidth, headerHeight);
 
     const selectedRange = this.selectionManager.getSelectedRange();

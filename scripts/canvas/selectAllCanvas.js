@@ -22,8 +22,8 @@ export class SelectAllCanvas {
    * Renders Top Left corner of grid
    */
   render() {
-    const width = this.columns.getX(1) / 2;
-    const height = this.rows.getY(1);
+    const width = 50;
+    const height = 25;
 
     setupCanvas(this.ctx, this.canvas, width, height);
     this.ctx.fillStyle = "#f3f3f3";

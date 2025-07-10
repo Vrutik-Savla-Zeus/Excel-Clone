@@ -35,6 +35,7 @@ export class CellData {
         const x = this.columns.getX(col) - scrollLeft + 2;
         const y =
           this.rows.getY(row) - scrollTop + this.rows.getHeight(row) / 2 + 2;
+        // console.log(value.toString().slice(0, 4));
         ctx.fillText(value, x, y);
       }
     }

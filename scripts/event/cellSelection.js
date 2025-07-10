@@ -76,23 +76,7 @@ export class CellSelection {
       this.awaitingEditFromDblClick = true;
     }
 
-    this.container.addEventListener("click", (e) => {
-      if (this.hasDragged || this.suppressNextClick) {
-        e.preventDefault();
-        this.suppressNextClick = false;
-        return;
-      }
-
-      const rect = this.gridCanvas.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left + this.container.scrollLeft;
-      const y = e.clientY - rect.top + this.container.scrollTop;
-
-      const col = this.columns.findColumnAtX(x);
-      const row = this.rows.findRowAtY(y);
-
-      this.gridCanvas.selectionManager.setSelectedCell(row, col);
-      this.render();
-    });
+    this.container.addEventListener("click", this._cellSelect);
   }
 
   onPointerMove(e) {
@@ -127,6 +111,25 @@ export class CellSelection {
     this.isEditingAndDragging = false;
     this.awaitingEditFromDblClick = false;
 
+    this.container.removeEventListener("click", this._cellSelect);
+    this.render();
+  }
+
+  _cellSelect(e) {
+    if (this.hasDragged || this.suppressNextClick) {
+      e.preventDefault();
+      this.suppressNextClick = false;
+      return;
+    }
+
+    const rect = this.gridCanvas.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left + this.container.scrollLeft;
+    const y = e.clientY - rect.top + this.container.scrollTop;
+
+    const col = this.columns.findColumnAtX(x);
+    const row = this.rows.findRowAtY(y);
+
+    this.gridCanvas.selectionManager.setSelectedCell(row, col);
     this.render();
   }
 
@@ -167,7 +170,6 @@ export class CellSelection {
 
 /*
 ISSUE:
-- After selecting cell, if I try to so column or row selection then the cell where pointerUp event takes place in row/column selection that cell gets selected as a cell selection.
 - On resizing first row, the row above it (which is my header canvas), header canvas gets resize.
 - If cursor is row/column resize and I move to gridCanvas then cursor remaings row/column resize instead of cell.
 - If I perform any selection and then do scroll event through click (by clicking scrollbars) then cell behind scrollbar gets selected (rather i need persistant of any selection when i perform scroll event through click) 
