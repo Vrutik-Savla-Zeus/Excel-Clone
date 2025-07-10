@@ -4,6 +4,8 @@ import { RowResize } from "./rowResize.js";
 import { ColumnSelection } from "./columnSelection.js";
 import { RowSelection } from "./rowSelection.js";
 import { CellSelection } from "./cellSelection.js";
+import { handleScroll } from "./scroll.js";
+import { handleResize } from "./windowResize.js";
 
 export class EventManager {
   constructor({
@@ -37,8 +39,8 @@ export class EventManager {
   }
 
   _init() {
-    this._handleScroll();
-    this._handleResize();
+    handleScroll(this.container, this.cellInput, this.render);
+    handleResize(this.render);
 
     this.touchManager = new TouchManager(this.container);
 
@@ -101,29 +103,5 @@ export class EventManager {
         cellData: this.cellData,
       })
     );
-  }
-
-  _handleScroll() {
-    this.container.addEventListener("scroll", () => {
-      if (
-        this.cellInput.style.display === "block" &&
-        this.editingRow !== null
-      ) {
-        const position = this.getInputPosition(
-          this.editingRow,
-          this.editingCol
-        );
-        this.cellInput.style.left = `${position.left}px`;
-        this.cellInput.style.top = `${position.top}px`;
-      }
-
-      requestAnimationFrame(() => this.render());
-    });
-  }
-
-  _handleResize() {
-    window.addEventListener("resize", () => {
-      requestAnimationFrame(() => this.render());
-    });
   }
 }
