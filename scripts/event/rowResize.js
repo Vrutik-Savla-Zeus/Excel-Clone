@@ -48,6 +48,8 @@ export class RowResize {
       this.wrapper.style.cursor = "row-resize";
       this.activeRow = row;
       return true;
+    } else {
+      this.wrapper.style.cursor = "cell";
     }
 
     return false;
@@ -68,7 +70,6 @@ export class RowResize {
   }
 
   onPointerUp(e) {
-    this.wrapper.style.cursor = "cell";
     this.activeRow = null;
   }
 }

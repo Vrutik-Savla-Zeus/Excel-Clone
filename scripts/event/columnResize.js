@@ -48,6 +48,8 @@ export class ColumnResize {
       this.wrapper.style.cursor = "col-resize";
       this.activeCol = col;
       return true;
+    } else {
+      this.wrapper.style.cursor = "cell";
     }
 
     return false;

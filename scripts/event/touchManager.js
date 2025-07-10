@@ -5,7 +5,6 @@ export class TouchManager {
 
     this.handlers = [];
     this.activeHandler = null;
-    this.currentHandler = null;
 
     this._initListeners();
   }
@@ -16,48 +15,47 @@ export class TouchManager {
 
   _initListeners() {
     this.container.addEventListener("pointerdown", (e) =>
-      this._onPointerDown(e)
+      this._handlePointerDown(e)
     );
     this.container.addEventListener("pointermove", (e) =>
-      this._onPointerMove(e)
+      this._handlePointerMove(e)
     );
-    this.container.addEventListener("pointerup", (e) => this._onPointerUp(e));
+    this.container.addEventListener("pointerup", (e) =>
+      this._handlePointerUp(e)
+    );
   }
 
-  _onPointerMove(e) {
-    if (this.currentHandler) {
-      this.currentHandler.onPointerMove(e);
+  _handlePointerDown(e) {
+    if (this.activeHandler !== null) {
+      this.activeHandler.onPointerDown?.(e);
       return;
     }
 
-    let found = false;
-
     for (const handler of this.handlers) {
-      const isHit = handler.hitTest(e);
-      if (isHit) {
+      if (handler.hitTest?.(e)) {
         this.activeHandler = handler;
-        found = true;
+        handler.onPointerDown?.(e);
         break;
       }
     }
+  }
 
-    if (!found) {
+  _handlePointerMove(e) {
+    if (this.activeHandler !== null) {
+      this.activeHandler.onPointerMove?.(e);
+    } else {
+      for (const handler of this.handlers) {
+        if (handler.hitTest?.(e)) {
+          return;
+        }
+      }
+    }
+  }
+
+  _handlePointerUp(e) {
+    if (this.activeHandler !== null) {
+      this.activeHandler.onPointerUp?.(e);
       this.activeHandler = null;
-      this.wrapper.style.cursor = "cell";
-    }
-  }
-
-  _onPointerDown(e) {
-    if (this.activeHandler) {
-      this.currentHandler = this.activeHandler;
-      this.currentHandler.onPointerDown(e);
-    }
-  }
-
-  _onPointerUp(e) {
-    if (this.currentHandler) {
-      this.currentHandler.onPointerUp(e);
-      this.currentHandler = null;
     }
   }
 }
