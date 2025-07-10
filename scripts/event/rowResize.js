@@ -47,12 +47,10 @@ export class RowResize {
     if (nearTopEdge && row > 0) {
       this.wrapper.style.cursor = "row-resize";
       this.activeRow = row - 1; // Resize previous row
-      this.resizeEdge = "top";
       return true;
     } else if (nearBottomEdge) {
       this.wrapper.style.cursor = "row-resize";
       this.activeRow = row;
-      this.resizeEdge = "bottom";
       return true;
     } else {
       this.wrapper.style.cursor = "cell";

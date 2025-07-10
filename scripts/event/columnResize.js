@@ -47,12 +47,10 @@ export class ColumnResize {
     if (nearLeftEdge && col > 0) {
       this.wrapper.style.cursor = "col-resize";
       this.activeCol = col - 1; // Resize the previous column
-      this.resizeEdge = "left";
       return true;
     } else if (nearRightEdge) {
       this.wrapper.style.cursor = "col-resize";
       this.activeCol = col; // Resize current column
-      this.resizeEdge = "right";
       return true;
     } else {
       this.wrapper.style.cursor = "cell";

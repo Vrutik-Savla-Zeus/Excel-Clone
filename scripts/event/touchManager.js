@@ -3,7 +3,7 @@ export class TouchManager {
     this.container = container;
 
     this.handlers = [];
-    this.activeHandler = null;
+    this.currentHandler = null;
 
     this._initListeners();
   }
@@ -25,14 +25,14 @@ export class TouchManager {
   }
 
   _handlePointerDown(e) {
-    if (this.activeHandler !== null) {
-      this.activeHandler.onPointerDown?.(e);
+    if (this.currentHandler !== null) {
+      this.currentHandler.onPointerDown?.(e);
       return;
     }
 
     for (const handler of this.handlers) {
       if (handler.hitTest?.(e)) {
-        this.activeHandler = handler;
+        this.currentHandler = handler;
         handler.onPointerDown?.(e);
         break;
       }
@@ -40,8 +40,8 @@ export class TouchManager {
   }
 
   _handlePointerMove(e) {
-    if (this.activeHandler !== null) {
-      this.activeHandler.onPointerMove?.(e);
+    if (this.currentHandler !== null) {
+      this.currentHandler.onPointerMove?.(e);
     } else {
       for (const handler of this.handlers) {
         if (handler.hitTest?.(e)) {
@@ -52,9 +52,9 @@ export class TouchManager {
   }
 
   _handlePointerUp(e) {
-    if (this.activeHandler !== null) {
-      this.activeHandler.onPointerUp?.(e);
-      this.activeHandler = null;
+    if (this.currentHandler !== null) {
+      this.currentHandler.onPointerUp?.(e);
+      this.currentHandler = null;
     }
   }
 }
