@@ -32,6 +32,7 @@ export class ExcelDOMRenderer {
     input.name = "cell-input";
     input.type = "text";
     input.className = "cell-input";
+    input.tabIndex = 0;
     return input;
   }
 

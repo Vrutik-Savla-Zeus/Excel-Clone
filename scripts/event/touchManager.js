@@ -1,7 +1,6 @@
 export class TouchManager {
-  constructor(container, wrapper) {
+  constructor(container) {
     this.container = container;
-    this.wrapper = wrapper;
 
     this.handlers = [];
     this.activeHandler = null;
