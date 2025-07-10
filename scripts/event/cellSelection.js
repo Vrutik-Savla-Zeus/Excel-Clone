@@ -3,6 +3,7 @@ import { getDpr } from "../utils/utils.js";
 export class CellSelection {
   constructor({
     container,
+    wrapper,
     gridCanvas,
     columns,
     rows,
@@ -12,6 +13,7 @@ export class CellSelection {
     cellData,
   }) {
     this.container = container;
+    this.wrapper = wrapper;
     this.gridCanvas = gridCanvas;
     this.columns = columns;
     this.rows = rows;
@@ -38,6 +40,14 @@ export class CellSelection {
     const rect = this.gridCanvas.canvas.getBoundingClientRect();
     const withinX = e.clientX >= rect.left && e.clientX <= rect.right;
     const withinY = e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+    const isScrollbarClick =
+      e.offsetX > e.target.clientWidth || e.offsetY > e.target.clientHeight;
+    if (isScrollbarClick) return false;
+
+    if (withinX && withinY) {
+      this.wrapper.style.cursor = "cell";
+    }
     return withinX && withinY;
   }
 
@@ -167,15 +177,3 @@ export class CellSelection {
     this.editingCol = col;
   }
 }
-
-/*
-ISSUE:
-- On resizing first row, the row above it (which is my header canvas), header canvas gets resize.
-- If cursor is row/column resize and I move to gridCanvas then cursor remaings row/column resize instead of cell.
-- If I perform any selection and then do scroll event through click (by clicking scrollbars) then cell behind scrollbar gets selected (rather i need persistant of any selection when i perform scroll event through click) 
-- Individual header and index also get selected (basically cell selection on header and index) I don't want this to happen. Index and header will be selected as row or column selection only and Not any other selectionlike cell selection alone
-
-You prioritize which issue to fix and we will be solving each issue promptwise and stepwise by debugging
-*/
-
-// get cell size from row and column into cellData to trim and make dynamic w.r.t cell size

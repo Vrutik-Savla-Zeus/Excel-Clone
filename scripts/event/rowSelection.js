@@ -22,6 +22,11 @@ export class RowSelection {
     const rect = this.indexCanvas.canvas.getBoundingClientRect();
     const withinX = e.clientX >= rect.left && e.clientX <= rect.right;
     const withinY = e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+    const isScrollbarClick =
+      e.offsetX > e.target.clientWidth || e.offsetY > e.target.clientHeight;
+    if (isScrollbarClick) return false;
+
     return withinX && withinY;
   }
 

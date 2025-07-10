@@ -91,6 +91,7 @@ export class EventManager {
     this.touchManager.registerHandler(
       new CellSelection({
         container: this.container,
+        wrapper: this.wrapper,
         gridCanvas: this.gridCanvas,
         columns: this.columns,
         rows: this.rows,
