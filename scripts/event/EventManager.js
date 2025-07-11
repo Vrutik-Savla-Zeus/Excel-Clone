@@ -13,7 +13,6 @@ export class EventManager {
     wrapper,
     cellInput,
     render,
-    getInputPosition,
     gridCanvas,
     headerCanvas,
     indexCanvas,
@@ -26,7 +25,6 @@ export class EventManager {
     this.wrapper = wrapper;
     this.cellInput = cellInput;
     this.render = render;
-    this.getInputPosition = getInputPosition;
     this.gridCanvas = gridCanvas;
     this.headerCanvas = headerCanvas;
     this.indexCanvas = indexCanvas;
@@ -92,14 +90,7 @@ export class EventManager {
     this.touchManager.registerHandler(this.rowSelection);
     this.touchManager.registerHandler(this.cellSelection);
 
-    handleScroll(
-      this.container,
-      this.getInputPosition,
-      this.cellInput,
-      this.editingRow,
-      this.editingCol,
-      this.render
-    );
+    handleScroll(this.container, this.render);
 
     handleResize(this.render);
   }

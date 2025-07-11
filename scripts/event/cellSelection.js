@@ -8,7 +8,6 @@ export class CellSelection {
     columns,
     rows,
     cellInput,
-    getInputPosition,
     render,
     cellData,
   }) {
@@ -18,7 +17,6 @@ export class CellSelection {
     this.columns = columns;
     this.rows = rows;
     this.cellInput = cellInput;
-    this.getInputPosition = getInputPosition;
     this.render = render;
     this.cellData = cellData;
 
@@ -34,6 +32,8 @@ export class CellSelection {
 
     this.lastClickTime = 0;
     this.lastClickCell = null;
+
+    this.inputScroll();
   }
 
   hitTest(e) {
@@ -146,7 +146,8 @@ export class CellSelection {
   _startEditing(row, col) {
     const dpr = getDpr();
     this._setEditingCell(row, col);
-    const position = this.getInputPosition(row, col);
+    const position = this.getInputPosition();
+    // const position = this.getInputPosition(row, col);
 
     this.cellInput.style.display = "block";
     this.cellInput.style.left = `${position.left}px`;
@@ -175,5 +176,35 @@ export class CellSelection {
   _setEditingCell(row, col) {
     this.editingRow = row;
     this.editingCol = col;
+  }
+
+  getInputPosition() {
+    const containerRect = this.container.getBoundingClientRect();
+    const left =
+      this.columns.getX(this.editingCol) -
+      this.container.scrollLeft +
+      this.columns.getX(1) / 2 +
+      containerRect.left;
+
+    const top =
+      this.rows.getY(this.editingRow) -
+      this.container.scrollTop +
+      this.rows.getY(1) +
+      containerRect.top;
+
+    return { left, top };
+  }
+
+  inputScroll() {
+    this.container.addEventListener("scroll", () => {
+      if (cellInput.style.display === "block" && this.editingRow !== null) {
+        const position = this.getInputPosition(
+          this.editingRow,
+          this.editingCol
+        );
+        cellInput.style.left = `${position.left}px`;
+        cellInput.style.top = `${position.top}px`;
+      }
+    });
   }
 }
