@@ -117,3 +117,17 @@ export function resizeWrapper(wrapper, columns, rows) {
   wrapper.style.width = `${columns.getTotalWidth() + 50}px`;
   wrapper.style.height = `${rows.getTotalHeight() + 25}px`;
 }
+
+export function getInputPosition(container, columns, rows, col, row) {
+  const containerRect = container.getBoundingClientRect();
+  const left =
+    columns.getX(col) -
+    container.scrollLeft +
+    columns.getX(1) / 2 +
+    containerRect.left;
+
+  const top =
+    rows.getY(row) - container.scrollTop + rows.getY(1) + containerRect.top;
+
+  return { left, top };
+}

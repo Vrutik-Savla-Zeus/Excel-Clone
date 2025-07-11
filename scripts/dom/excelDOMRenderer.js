@@ -35,21 +35,4 @@ export class ExcelDOMRenderer {
     input.tabIndex = 0;
     return input;
   }
-
-  getInputPosition(row, col) {
-    const containerRect = this.container.getBoundingClientRect();
-    const left =
-      this.columns.getX(col) -
-      this.container.scrollLeft +
-      this.columns.getX(1) / 2 +
-      containerRect.left;
-
-    const top =
-      this.rows.getY(row) -
-      this.container.scrollTop +
-      this.rows.getY(1) +
-      containerRect.top;
-
-    return { left, top };
-  }
 }

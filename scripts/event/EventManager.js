@@ -13,7 +13,6 @@ export class EventManager {
     wrapper,
     cellInput,
     render,
-    getInputPosition,
     gridCanvas,
     headerCanvas,
     indexCanvas,
@@ -26,7 +25,6 @@ export class EventManager {
     this.wrapper = wrapper;
     this.cellInput = cellInput;
     this.render = render;
-    this.getInputPosition = getInputPosition;
     this.gridCanvas = gridCanvas;
     this.headerCanvas = headerCanvas;
     this.indexCanvas = indexCanvas;
@@ -40,70 +38,61 @@ export class EventManager {
 
   _init() {
     this.touchManager = new TouchManager(this.container);
+    this.columnResize = new ColumnResize({
+      container: this.container,
+      wrapper: this.wrapper,
+      headerCanvas: this.headerCanvas,
+      columns: this.columns,
+      rows: this.rows,
+      render: this.render,
+      edgeThreshold: 3,
+    });
+    this.rowResize = new RowResize({
+      container: this.container,
+      wrapper: this.wrapper,
+      indexCanvas: this.indexCanvas,
+      columns: this.columns,
+      rows: this.rows,
+      render: this.render,
+      edgeThreshold: 3,
+    });
+    this.columnSelection = new ColumnSelection({
+      container: this.container,
+      headerCanvas: this.headerCanvas,
+      columns: this.columns,
+      rows: this.rows,
+      selectionManager: this.gridCanvas.selectionManager,
+      render: this.render,
+    });
+    this.rowSelection = new RowSelection({
+      container: this.container,
+      indexCanvas: this.indexCanvas,
+      columns: this.columns,
+      rows: this.rows,
+      selectionManager: this.gridCanvas.selectionManager,
+      render: this.render,
+    });
+    this.cellSelection = new CellSelection({
+      container: this.container,
+      wrapper: this.wrapper,
+      gridCanvas: this.gridCanvas,
+      columns: this.columns,
+      rows: this.rows,
+      cellInput: this.cellInput,
+      render: this.render,
+      cellData: this.cellData,
+    });
 
-    this.touchManager.registerHandler(
-      new ColumnResize({
-        container: this.container,
-        wrapper: this.wrapper,
-        headerCanvas: this.headerCanvas,
-        columns: this.columns,
-        rows: this.rows,
-        render: this.render,
-        edgeThreshold: 3,
-      })
-    );
-
-    this.touchManager.registerHandler(
-      new RowResize({
-        container: this.container,
-        wrapper: this.wrapper,
-        indexCanvas: this.indexCanvas,
-        columns: this.columns,
-        rows: this.rows,
-        render: this.render,
-        edgeThreshold: 3,
-      })
-    );
-
-    this.touchManager.registerHandler(
-      new ColumnSelection({
-        container: this.container,
-        headerCanvas: this.headerCanvas,
-        columns: this.columns,
-        rows: this.rows,
-        selectionManager: this.gridCanvas.selectionManager,
-        render: this.render,
-      })
-    );
-
-    this.touchManager.registerHandler(
-      new RowSelection({
-        container: this.container,
-        indexCanvas: this.indexCanvas,
-        columns: this.columns,
-        rows: this.rows,
-        selectionManager: this.gridCanvas.selectionManager,
-        render: this.render,
-      })
-    );
-
-    this.touchManager.registerHandler(
-      new CellSelection({
-        container: this.container,
-        wrapper: this.wrapper,
-        gridCanvas: this.gridCanvas,
-        columns: this.columns,
-        rows: this.rows,
-        cellInput: this.cellInput,
-        getInputPosition: this.getInputPosition,
-        render: this.render,
-        cellData: this.cellData,
-      })
-    );
+    this.touchManager.registerHandler(this.columnResize);
+    this.touchManager.registerHandler(this.rowResize);
+    this.touchManager.registerHandler(this.columnSelection);
+    this.touchManager.registerHandler(this.rowSelection);
+    this.touchManager.registerHandler(this.cellSelection);
 
     handleScroll(
       this.container,
-      this.getInputPosition,
+      this.columns,
+      this.rows,
       this.cellInput,
       this.editingRow,
       this.editingCol,
