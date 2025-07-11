@@ -33,22 +33,22 @@ export class CellSelection {
     this.lastClickTime = 0;
     this.lastClickCell = null;
 
-    this.inputScroll();
+    this._bindKeyboardEvents();
+    this._inputScroll();
   }
 
   hitTest(e) {
     const rect = this.gridCanvas.canvas.getBoundingClientRect();
     const withinX = e.clientX >= rect.left && e.clientX <= rect.right;
     const withinY = e.clientY >= rect.top && e.clientY <= rect.bottom;
-
     const isScrollbarClick =
       e.offsetX > e.target.clientWidth || e.offsetY > e.target.clientHeight;
-    if (isScrollbarClick) return false;
 
-    if (withinX && withinY) {
+    if (withinX && withinY && !isScrollbarClick) {
       this.wrapper.style.cursor = "cell";
+      return true;
     }
-    return withinX && withinY;
+    return false;
   }
 
   onPointerDown(e) {
@@ -85,8 +85,7 @@ export class CellSelection {
       this.dblClickAnchor = { row, col };
       this.awaitingEditFromDblClick = true;
     }
-
-    this.container.addEventListener("click", this._cellSelect);
+    this._startEditing(row, col, false);
   }
 
   onPointerMove(e) {
@@ -114,40 +113,20 @@ export class CellSelection {
       this.dblClickAnchor
     ) {
       const { row, col } = this.dblClickAnchor;
-      this._startEditing(row, col);
+      this._startEditing(row, col, true);
     }
 
     this.isDragging = false;
     this.isEditingAndDragging = false;
     this.awaitingEditFromDblClick = false;
 
-    this.container.removeEventListener("click", this._cellSelect);
     this.render();
   }
 
-  _cellSelect(e) {
-    if (this.hasDragged || this.suppressNextClick) {
-      e.preventDefault();
-      this.suppressNextClick = false;
-      return;
-    }
-
-    const rect = this.gridCanvas.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left + this.container.scrollLeft;
-    const y = e.clientY - rect.top + this.container.scrollTop;
-
-    const col = this.columns.findColumnAtX(x);
-    const row = this.rows.findRowAtY(y);
-
-    this.gridCanvas.selectionManager.setSelectedCell(row, col);
-    this.render();
-  }
-
-  _startEditing(row, col) {
+  _startEditing(row, col, focus = false) {
     const dpr = getDpr();
     this._setEditingCell(row, col);
     const position = this.getInputPosition();
-    // const position = this.getInputPosition(row, col);
 
     this.cellInput.style.display = "block";
     this.cellInput.style.left = `${position.left}px`;
@@ -156,21 +135,9 @@ export class CellSelection {
     this.cellInput.style.height = `${this.rows.getHeight(row)}px`;
     this.cellInput.style.border = `${2 / dpr}px solid #008000`;
     this.cellInput.value = this.cellData.getCellData(row, col)?.value || "";
-    this.cellInput.focus();
-
-    const finishEdit = () => {
-      const value = this.cellInput.value.trim();
-      this.cellData.setCellData(row, col, value);
-      this.cellInput.style.display = "none";
-      this._setEditingCell(null, null);
-      this.gridCanvas.selectionManager.setSelectedCell(row, col);
-      this.render();
-    };
-
-    this.cellInput.onkeydown = (event) => {
-      if (event.key === "Enter") finishEdit();
-    };
-    this.cellInput.onblur = finishEdit;
+    setTimeout(() => {
+      focus ? this.cellInput.focus() : this.cellInput.blur();
+    }, 1);
   }
 
   _setEditingCell(row, col) {
@@ -195,7 +162,55 @@ export class CellSelection {
     return { left, top };
   }
 
-  inputScroll() {
+  _bindKeyboardEvents() {
+    document.addEventListener("keydown", (e) => {
+      const current = this.gridCanvas.selectionManager.getSelectedCell();
+      if (!current) return;
+
+      let { row, col } = current;
+      let moved = false;
+
+      const isCharKey =
+        e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+
+      if (isCharKey) {
+        let oldData = this.cellData.getCellData(row, col)?.value || "";
+        this.cellInput.focus();
+        this.cellData.setCellData(row, col, oldData + e.key);
+      }
+
+      switch (e.key) {
+        case "ArrowUp":
+          row = Math.max(0, row - 1);
+          moved = true;
+          break;
+        case "ArrowDown":
+        case "Enter":
+          row = Math.min(this.rows.heights.length - 1, row + 1);
+          moved = true;
+          break;
+        case "ArrowLeft":
+          col = Math.max(0, col - 1);
+          moved = true;
+          break;
+        case "ArrowRight":
+          col = Math.min(this.columns.widths.length - 1, col + 1);
+          moved = true;
+          break;
+      }
+
+      if (moved) {
+        e.preventDefault();
+        this.gridCanvas.selectionManager.setSelectedCell(row, col);
+        this.gridCanvas.selectionManager.setAnchorCell(row, col);
+        this.gridCanvas.selectionManager.setFocusCell(row, col);
+        this.render();
+        this._startEditing(row, col, false);
+      }
+    });
+  }
+
+  _inputScroll() {
     this.container.addEventListener("scroll", () => {
       if (cellInput.style.display === "block" && this.editingRow !== null) {
         const position = this.getInputPosition(

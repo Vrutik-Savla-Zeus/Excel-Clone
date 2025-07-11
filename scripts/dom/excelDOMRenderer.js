@@ -16,6 +16,7 @@ export class ExcelDOMRenderer {
     const container = document.createElement("div");
     container.className = "canvas-container";
     container.id = "canvasContainer";
+    container.tabIndex = "0";
     return container;
   }
 
