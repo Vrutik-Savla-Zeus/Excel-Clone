@@ -10,8 +10,23 @@
   </head>
   <body>
     <header class="excel-header">
-      <button>Load data</button>
-      <button>Clear data</button>
+      <div class="data-controls">
+        <select id="upload-select">
+          <option selected disabled>Upload</option>
+          <option value="json">Upload JSON</option>
+          <option value="csv">Upload CSV</option>
+        </select>
+        <input
+          id="file-input"
+          type="file"
+          style="display: none"
+          accept=".json,.csv"
+        />
+
+        <button id="download-csv">Download CSV</button>
+        <button id="clear-data">Clear Data</button>
+      </div>
+
       <div class="statistics">
         <span id="stat-count">Count: 00</span>
         <span id="stat-sum">Sum: 00</span>

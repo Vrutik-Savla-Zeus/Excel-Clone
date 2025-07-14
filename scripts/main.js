@@ -65,5 +65,66 @@ const eventManager = new EventManager({
 
 // 7. Initial Render
 render();
-await fetchData("../../data/data.json", cellData);
-render();
+document.getElementById("upload-select").addEventListener("change", (e) => {
+  const fileInput = document.getElementById("file-input");
+  fileInput.accept = e.target.value === "json" ? ".json" : ".csv";
+  fileInput.click();
+  e.target.selectedIndex = 0; // reset to placeholder
+});
+
+document.getElementById("file-input").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const isCSV = file.name.endsWith(".csv");
+  const text = await file.text();
+
+  if (isCSV) {
+    const rows = text
+      .trim()
+      .split("\n")
+      .map((r) => r.split(","));
+    const headers = rows[0];
+    const data = rows
+      .slice(1)
+      .map((r) => Object.fromEntries(r.map((val, i) => [headers[i], val])));
+    await cellData.loadFromJSON(data);
+  } else {
+    try {
+      const json = JSON.parse(text);
+      await cellData.loadFromJSON(json);
+    } catch (err) {
+      alert("Invalid JSON format.");
+    }
+  }
+
+  render();
+  e.target.value = ""; // reset file input
+});
+document.getElementById("clear-data").addEventListener("click", () => {
+  cellData.data = {};
+  render();
+});
+
+document.getElementById("download-csv").addEventListener("click", () => {
+  const rows = Object.entries(cellData.data)
+    .map(([key, val]) => {
+      const [row, col] = key.split(":").map(Number);
+      return { row, col, value: val.value ?? "" };
+    })
+    .reduce((acc, { row, col, value }) => {
+      acc[row] = acc[row] || [];
+      acc[row][col] = value;
+      return acc;
+    }, []);
+
+  const csv = rows
+    .map((row = []) => row.map((v = "") => `"${v}"`).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "sheet-data.csv";
+  link.click();
+});
