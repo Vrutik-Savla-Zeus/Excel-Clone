@@ -83,6 +83,8 @@ export class CellSelection {
 
     this.gridCanvas.selectionManager.setAnchorCell(row, col);
     this.gridCanvas.selectionManager.setFocusCell(row, col);
+    this.anchorRow = row;
+    this.anchorCol = col;
     this.render();
 
     if (isDoubleClick) {
@@ -108,6 +110,49 @@ export class CellSelection {
     if (distX > 3 || distY > 3) this.hasDragged = true;
 
     this.gridCanvas.selectionManager.setFocusCell(row, col);
+
+    const AUTO_SCROLL_MARGIN = 30; // px near edges to trigger scroll
+    const AUTO_SCROLL_SPEED = 20; // px per frame
+
+    if (this.isDragging) {
+      const containerRect = this.container.getBoundingClientRect();
+      const { clientX, clientY } = e;
+
+      // Directions
+      const dx =
+        clientX < containerRect.left + AUTO_SCROLL_MARGIN
+          ? -AUTO_SCROLL_SPEED
+          : clientX > containerRect.right - AUTO_SCROLL_MARGIN
+          ? AUTO_SCROLL_SPEED
+          : 0;
+
+      const dy =
+        clientY < containerRect.top + AUTO_SCROLL_MARGIN
+          ? -AUTO_SCROLL_SPEED
+          : clientY > containerRect.bottom - AUTO_SCROLL_MARGIN
+          ? AUTO_SCROLL_SPEED
+          : 0;
+
+      if (dx !== 0 || dy !== 0) {
+        if (!this._autoScrollRAF) {
+          const scroll = () => {
+            this.container.scrollLeft += dx;
+            this.container.scrollTop += dy;
+
+            // re-update selection based on new pointer
+            this._updateSelectionFromPointer(clientX, clientY);
+            this.render();
+
+            this._autoScrollRAF = requestAnimationFrame(scroll);
+          };
+          this._autoScrollRAF = requestAnimationFrame(scroll);
+        }
+      } else {
+        cancelAnimationFrame(this._autoScrollRAF);
+        this._autoScrollRAF = null;
+      }
+    }
+
     this.render();
   }
 
@@ -124,6 +169,11 @@ export class CellSelection {
     this.isDragging = false;
     this.isEditingAndDragging = false;
     this.awaitingEditFromDblClick = false;
+
+    if (this._autoScrollRAF) {
+      cancelAnimationFrame(this._autoScrollRAF);
+      this._autoScrollRAF = null;
+    }
 
     this.render();
   }
@@ -224,6 +274,9 @@ export class CellSelection {
           this.cellInput.focus();
           this.cellInput.value = "";
         }
+      } else if (e.key === "Escape" && this._autoScrollRAF) {
+        cancelAnimationFrame(this._autoScrollRAF);
+        this._autoScrollRAF = null;
       }
 
       if (moved) {
@@ -248,5 +301,23 @@ export class CellSelection {
         cellInput.style.top = `${position.top}px`;
       }
     });
+  }
+
+  _updateSelectionFromPointer(clientX, clientY) {
+    const x =
+      clientX -
+      this.container.getBoundingClientRect().left +
+      this.container.scrollLeft;
+    const y =
+      clientY -
+      this.container.getBoundingClientRect().top +
+      this.container.scrollTop;
+
+    const col = this.columns.findColumnAtX(x);
+    const row = this.rows.findRowAtY(y);
+
+    if (row >= 0 && col >= 0) {
+      this.gridCanvas.selectionManager.setFocusCell(row, col);
+    }
   }
 }
