@@ -6,12 +6,14 @@ import { RowSelection } from "./rowSelection.js";
 import { CellSelection } from "./cellSelection.js";
 import { handleScroll } from "./scroll.js";
 import { handleResize } from "./windowResize.js";
+import { RowColumnManipulate } from "./rowColumnManipulate.js";
 
 export class EventManager {
   constructor({
     container,
     wrapper,
     cellInput,
+    contextMenu,
     render,
     gridCanvas,
     headerCanvas,
@@ -24,6 +26,7 @@ export class EventManager {
     this.container = container;
     this.wrapper = wrapper;
     this.cellInput = cellInput;
+    this.contextMenu = contextMenu;
     this.render = render;
     this.gridCanvas = gridCanvas;
     this.headerCanvas = headerCanvas;
@@ -83,12 +86,21 @@ export class EventManager {
       render: this.render,
       cellData: this.cellData,
     });
-
     this.touchManager.registerHandler(this.columnResize);
     this.touchManager.registerHandler(this.rowResize);
     this.touchManager.registerHandler(this.columnSelection);
     this.touchManager.registerHandler(this.rowSelection);
     this.touchManager.registerHandler(this.cellSelection);
+
+    this.rowColumnManipulate = new RowColumnManipulate({
+      container: this.container,
+      contextMenu: this.contextMenu,
+      gridCanvas: this.gridCanvas,
+      cellData: this.cellData,
+      columns: this.columns,
+      rows: this.rows,
+      render: this.render,
+    });
 
     handleScroll(this.container, this.render);
 

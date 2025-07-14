@@ -89,3 +89,21 @@ body {
   outline: none;
   display: none;
 }
+
+.excel-context-menu {
+  background: white;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+  min-width: 160px;
+}
+
+.excel-context-menu > div {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.excel-context-menu > div:hover {
+  background: #f0f0f0;
+}

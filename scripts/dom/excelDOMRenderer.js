@@ -6,6 +6,7 @@ export class ExcelDOMRenderer {
     this.container = this._createCanvasContainer();
     this.wrapper = this._createCanvasWrapper();
     this.cellInput = this._createInput();
+    this.contextMenu = this._createContextMenu();
 
     this.container.appendChild(this.wrapper);
     document.body.appendChild(this.container);
@@ -35,5 +36,24 @@ export class ExcelDOMRenderer {
     input.className = "cell-input";
     input.tabIndex = 0;
     return input;
+  }
+
+  _createContextMenu() {
+    const menu = document.createElement("div");
+    menu.id = "contextMenu";
+    menu.className = "excel-context-menu";
+    menu.style.position = "absolute";
+    menu.style.display = "none";
+    menu.style.zIndex = "1000";
+    menu.innerHTML = `
+    <div data-action="insert-row-above">Insert row above</div>
+    <div data-action="insert-row-below">Insert row below</div>
+    <div data-action="insert-col-left">Insert column left</div>
+    <div data-action="insert-col-right">Insert column right</div>
+    <div data-action="delete-row">Delete row</div>
+    <div data-action="delete-col">Delete column</div>
+  `;
+    document.body.appendChild(menu);
+    return menu;
   }
 }

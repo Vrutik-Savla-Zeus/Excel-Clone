@@ -52,6 +52,7 @@ const eventManager = new EventManager({
   container: dom.container,
   wrapper: dom.wrapper,
   cellInput: dom.cellInput,
+  contextMenu: dom.contextMenu,
   render,
   gridCanvas,
   headerCanvas,
