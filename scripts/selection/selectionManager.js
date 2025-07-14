@@ -25,7 +25,8 @@ export class SelectionManager {
     ctx.save();
     ctx.strokeStyle = "#008000";
     ctx.lineWidth = 2 / dpr;
-    ctx.strokeRect(borderX + 1, borderY + 1, borderW - 2, borderH - 2);
+    // ctx.strokeRect(borderX + 1, borderY + 1, borderW - 2, borderH - 2);
+    ctx.strokeRect(borderX, borderY, borderW, borderH);
     ctx.restore();
   }
 

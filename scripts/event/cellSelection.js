@@ -188,7 +188,8 @@ export class CellSelection {
     this.cellInput.style.top = `${position.top}px`;
     this.cellInput.style.width = `${this.columns.getWidth(col)}px`;
     this.cellInput.style.height = `${this.rows.getHeight(row)}px`;
-    this.cellInput.style.border = `${2 / dpr}px solid #008000`;
+    this.cellInput.style.border = `none`;
+    // this.cellInput.style.border = `${2 / dpr}px solid #008000`;
     this.cellInput.value = this.cellData.getCellData(row, col)?.value || "";
     setTimeout(() => {
       focus ? this.cellInput.focus() : this.cellInput.blur();
