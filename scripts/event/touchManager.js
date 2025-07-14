@@ -25,11 +25,6 @@ export class TouchManager {
   }
 
   _handlePointerDown(e) {
-    if (this.currentHandler !== null) {
-      this.currentHandler.onPointerDown?.(e);
-      return;
-    }
-
     for (const handler of this.handlers) {
       if (handler.hitTest?.(e)) {
         this.currentHandler = handler;

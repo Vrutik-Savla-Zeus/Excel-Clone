@@ -117,37 +117,3 @@ export function resizeWrapper(wrapper, columns, rows) {
   wrapper.style.width = `${columns.getTotalWidth() + 50}px`;
   wrapper.style.height = `${rows.getTotalHeight() + 25}px`;
 }
-
-// export function getInputPosition(container, columns, rows, col, row) {
-//   console.log("getInputPosition");
-//   const containerRect = container.getBoundingClientRect();
-//   const left =
-//     columns.getX(col) -
-//     container.scrollLeft +
-//     columns.getX(1) / 2 +
-//     containerRect.left;
-
-//   const top =
-//     rows.getY(row) - container.scrollTop + rows.getY(1) + containerRect.top;
-
-//   return { left, top };
-// }
-
-// export function setInputCellPosition(
-//   container,
-//   cellInput,
-//   columns,
-//   rows,
-//   row,
-//   col
-// ) {
-//   const dpr = getDpr();
-//   const position = getInputPosition(container, columns, rows, col, row);
-//   cellInput.style.left = `${position.left}px`;
-//   cellInput.style.top = `${position.top}px`;
-//   cellInput.style.width = `${columns.getWidth(col)}px`;
-//   cellInput.style.height = `${rows.getHeight(row)}px`;
-//   cellInput.style.border = `${2 / dpr}px solid #008000`;
-
-//   // this.cellInput.value = initialChar || this.cellData.getCellData(row, col)?.value || "";
-// }
