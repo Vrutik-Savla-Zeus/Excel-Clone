@@ -30,6 +30,9 @@ export class CellSelection {
     this.startY = 0;
     this.hasDragged = false;
 
+    this.editingRow = null;
+    this.editingCol = null;
+
     this.lastClickTime = 0;
     this.lastClickCell = null;
 
@@ -52,6 +55,8 @@ export class CellSelection {
   }
 
   onPointerDown(e) {
+    this._saveInputValue();
+
     this.hasDragged = false;
     this.isDragging = true;
 
@@ -126,7 +131,7 @@ export class CellSelection {
   _startEditing(row, col, focus = false) {
     const dpr = getDpr();
     this._setEditingCell(row, col);
-    const position = this.getInputPosition();
+    const position = this._getInputPosition();
 
     this.cellInput.style.display = "block";
     this.cellInput.style.left = `${position.left}px`;
@@ -145,7 +150,7 @@ export class CellSelection {
     this.editingCol = col;
   }
 
-  getInputPosition() {
+  _getInputPosition() {
     const containerRect = this.container.getBoundingClientRect();
     const left =
       this.columns.getX(this.editingCol) -
@@ -162,41 +167,63 @@ export class CellSelection {
     return { left, top };
   }
 
+  _saveInputValue() {
+    const row = this.editingRow;
+    const col = this.editingCol;
+
+    if (row === null || col === null) return;
+
+    const newValue = this.cellInput.value.trim();
+    const existing = this.cellData.getCellData(row, col)?.value || "";
+
+    if (newValue !== existing) {
+      this.cellData.setCellData(row, col, newValue);
+    }
+
+    // Update selected cell just to be safe
+    this.gridCanvas.selectionManager.setSelectedCell(row, col);
+    this.render();
+  }
+
   _bindKeyboardEvents() {
     document.addEventListener("keydown", (e) => {
-      const current = this.gridCanvas.selectionManager.getSelectedCell();
+      const current = this.gridCanvas.selectionManager.getAnchorCell();
       if (!current) return;
 
       let { row, col } = current;
       let moved = false;
 
       const isCharKey =
-        e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+        e.key?.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
 
       if (isCharKey) {
-        let oldData = this.cellData.getCellData(row, col)?.value || "";
-        this.cellInput.focus();
-        this.cellData.setCellData(row, col, oldData + e.key);
-      }
-
-      switch (e.key) {
-        case "ArrowUp":
-          row = Math.max(0, row - 1);
-          moved = true;
-          break;
-        case "ArrowDown":
-        case "Enter":
-          row = Math.min(this.rows.heights.length - 1, row + 1);
-          moved = true;
-          break;
-        case "ArrowLeft":
-          col = Math.max(0, col - 1);
-          moved = true;
-          break;
-        case "ArrowRight":
-          col = Math.min(this.columns.widths.length - 1, col + 1);
-          moved = true;
-          break;
+        if (document.activeElement === this.cellInput) {
+        } else {
+          this.cellInput.focus();
+          this.cellInput.value = "";
+        }
+      } else if (e.key === "ArrowUp") {
+        this._saveInputValue();
+        row = Math.max(0, row - 1);
+        moved = true;
+      } else if (e.key === "ArrowDown" || e.key === "Enter") {
+        this._saveInputValue();
+        row = Math.min(this.rows.heights.length - 1, row + 1);
+        moved = true;
+      } else if (e.key === "ArrowLeft") {
+        this._saveInputValue();
+        col = Math.max(0, col - 1);
+        moved = true;
+      } else if (e.key === "ArrowRight") {
+        this._saveInputValue();
+        col = Math.min(this.columns.widths.length - 1, col + 1);
+        moved = true;
+      } else if (e.key === "Backspace") {
+        if (document.activeElement === this.cellInput) {
+        } else {
+          this.cellInput.focus();
+          this.cellInput.value = "";
+        }
       }
 
       if (moved) {
@@ -213,7 +240,7 @@ export class CellSelection {
   _inputScroll() {
     this.container.addEventListener("scroll", () => {
       if (cellInput.style.display === "block" && this.editingRow !== null) {
-        const position = this.getInputPosition(
+        const position = this._getInputPosition(
           this.editingRow,
           this.editingCol
         );
