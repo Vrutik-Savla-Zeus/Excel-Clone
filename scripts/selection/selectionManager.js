@@ -152,7 +152,6 @@ export class SelectionManager {
     const avg = count ? sum / count : 0;
     const min = count ? Math.min(...values) : 0;
     const max = count ? Math.max(...values) : 0;
-    console.log(count, sum, avg, min, max);
 
     document.getElementById("stat-count").textContent = `Count: ${count}`;
     document.getElementById("stat-sum").textContent = `Sum: ${sum}`;

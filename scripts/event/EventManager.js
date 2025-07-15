@@ -94,6 +94,7 @@ export class EventManager {
 
     this.rowColumnManipulate = new RowColumnManipulate({
       container: this.container,
+      wrapper: this.wrapper,
       contextMenu: this.contextMenu,
       gridCanvas: this.gridCanvas,
       cellData: this.cellData,

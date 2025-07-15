@@ -4,6 +4,7 @@ import { getColumnLabel, resizeWrapper } from "../utils/utils.js";
 export class RowColumnManipulate {
   constructor({
     container,
+    wrapper,
     contextMenu,
     gridCanvas,
     cellData,
@@ -12,6 +13,7 @@ export class RowColumnManipulate {
     render,
   }) {
     this.container = container;
+    this.wrapper = wrapper;
     this.contextMenu = contextMenu;
     this.gridCanvas = gridCanvas;
     this.cellData = cellData;
@@ -38,7 +40,7 @@ export class RowColumnManipulate {
       this.col = this.columns.findColumnAtX(x);
       this.contextMenu.querySelector(
         "[data-action='delete-row']"
-      ).innerText = `Delete row ${this.row + 1}`;
+      ).innerText = `Delete row ${this.row}`;
       this.contextMenu.querySelector(
         "[data-action='delete-col']"
       ).innerText = `Delete column ${getColumnLabel(this.col)}`;
@@ -59,19 +61,19 @@ export class RowColumnManipulate {
 
       switch (action) {
         case "insert-row-above":
-          this.insertRowAt(row);
+          this.insertRowAt(row - 1);
           break;
         case "insert-row-below":
-          this.insertRowAt(row + 1);
+          this.insertRowAt(row);
           break;
         case "delete-row":
-          this.deleteRowAt(row);
+          this.deleteRowAt(row - 1);
           break;
         case "insert-col-left":
-          this.insertColAt(col);
+          this.insertColAt(col - 1);
           break;
         case "insert-col-right":
-          this.insertColAt(col + 1);
+          this.insertColAt(col);
           break;
         case "delete-col":
           this.deleteColAt(col);
@@ -79,7 +81,7 @@ export class RowColumnManipulate {
       }
 
       this.contextMenu.style.display = "none";
-      resizeWrapper(this.container, this.columns, this.rows);
+      resizeWrapper(this.wrapper, this.columns, this.rows);
       this.render();
     });
   }
