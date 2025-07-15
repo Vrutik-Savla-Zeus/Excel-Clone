@@ -184,10 +184,10 @@ export class CellSelection {
     const position = this._getInputPosition();
 
     this.cellInput.style.display = "block";
-    this.cellInput.style.left = `${position.left}px`;
-    this.cellInput.style.top = `${position.top}px`;
-    this.cellInput.style.width = `${this.columns.getWidth(col)}px`;
-    this.cellInput.style.height = `${this.rows.getHeight(row)}px`;
+    this.cellInput.style.left = `${position.left + 1}px`;
+    this.cellInput.style.top = `${position.top + 1}px`;
+    this.cellInput.style.width = `${this.columns.getWidth(col) - 2}px`;
+    this.cellInput.style.height = `${this.rows.getHeight(row) - 2}px`;
     this.cellInput.style.border = `none`;
     this.cellInput.style.border = `${2 / dpr}px solid transparent`;
     this.cellInput.value = this.cellData.getCellData(row, col)?.value || "";
@@ -324,7 +324,6 @@ export class CellSelection {
 }
 
 /*
-- Hide statistics if not present, instead of showing 00 values.
 - Find row / column manipulation issues and rectify them one by one.
 - Understand whole codee.
 - Auto scroll issue.

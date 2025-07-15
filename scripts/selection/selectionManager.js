@@ -142,6 +142,11 @@ export class SelectionManager {
       }
     }
 
+    const statistics = document.querySelector(".statistics");
+    !values.length
+      ? (statistics.style.display = `none`)
+      : (statistics.style.display = `flex`);
+
     const count = values.length;
     const sum = values.reduce((a, b) => a + b, 0);
     const avg = count ? sum / count : 0;
