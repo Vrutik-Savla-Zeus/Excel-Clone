@@ -28,7 +28,7 @@ body {
 }
 
 .statistics {
-  display: flex;
+  display: none;
   gap: 12px;
 }
 
