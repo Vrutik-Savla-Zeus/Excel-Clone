@@ -111,8 +111,8 @@ export class CellSelection {
 
     this.gridCanvas.selectionManager.setFocusCell(row, col);
 
-    const AUTO_SCROLL_MARGIN = 30; // px near edges to trigger scroll
-    const AUTO_SCROLL_SPEED = 20; // px per frame
+    const autoScrollMargin = 30; // px near edges to trigger scroll
+    const autoScrollSpeed = 10; // px per frame
 
     if (this.isDragging) {
       const containerRect = this.container.getBoundingClientRect();
@@ -120,17 +120,17 @@ export class CellSelection {
 
       // Directions
       const dx =
-        clientX < containerRect.left + AUTO_SCROLL_MARGIN
-          ? -AUTO_SCROLL_SPEED
-          : clientX > containerRect.right - AUTO_SCROLL_MARGIN
-          ? AUTO_SCROLL_SPEED
+        clientX < containerRect.left + autoScrollMargin
+          ? -autoScrollSpeed
+          : clientX > containerRect.right - autoScrollMargin
+          ? autoScrollSpeed
           : 0;
 
       const dy =
-        clientY < containerRect.top + AUTO_SCROLL_MARGIN
-          ? -AUTO_SCROLL_SPEED
-          : clientY > containerRect.bottom - AUTO_SCROLL_MARGIN
-          ? AUTO_SCROLL_SPEED
+        clientY < containerRect.top + autoScrollMargin
+          ? -autoScrollSpeed
+          : clientY > containerRect.bottom - autoScrollMargin
+          ? autoScrollSpeed
           : 0;
 
       if (dx !== 0 || dy !== 0) {
@@ -189,7 +189,7 @@ export class CellSelection {
     this.cellInput.style.width = `${this.columns.getWidth(col)}px`;
     this.cellInput.style.height = `${this.rows.getHeight(row)}px`;
     this.cellInput.style.border = `none`;
-    // this.cellInput.style.border = `${2 / dpr}px solid #008000`;
+    this.cellInput.style.border = `${2 / dpr}px solid transparent`;
     this.cellInput.value = this.cellData.getCellData(row, col)?.value || "";
     setTimeout(() => {
       focus ? this.cellInput.focus() : this.cellInput.blur();
@@ -322,3 +322,10 @@ export class CellSelection {
     }
   }
 }
+
+/*
+- Hide statistics if not present, instead of showing 00 values.
+- Find row / column manipulation issues and rectify them one by one.
+- Understand whole codee.
+- Auto scroll issue.
+*/

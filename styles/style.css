@@ -88,7 +88,7 @@ body {
   box-sizing: border-box;
   outline: none;
   display: none;
-  background-color: transparent;
+  background-color: #fff;
 }
 
 .excel-context-menu {
