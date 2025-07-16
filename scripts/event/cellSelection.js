@@ -285,6 +285,7 @@ export class CellSelection {
         this.gridCanvas.selectionManager.setSelectedCell(row, col);
         this.gridCanvas.selectionManager.setAnchorCell(row, col);
         this.gridCanvas.selectionManager.setFocusCell(row, col);
+        this._scrollToCell(row, col);
         this.render();
         this._startEditing(row, col, false);
       }
@@ -321,10 +322,36 @@ export class CellSelection {
       this.gridCanvas.selectionManager.setFocusCell(row, col);
     }
   }
-}
 
-/*
-- Find row / column manipulation issues and rectify them one by one.
-- Understand whole codee.
-- Auto scroll issue.
-*/
+  _scrollToCell(row, col) {
+    const cellX = this.columns.getX(col);
+    const cellY = this.rows.getY(row);
+    const cellWidth = this.columns.getWidth(col);
+    const cellHeight = this.rows.getHeight(row);
+
+    const viewLeft = this.container.scrollLeft;
+    const viewTop = this.container.scrollTop;
+    const viewRight = viewLeft + this.container.clientWidth;
+    const viewBottom = viewTop + this.container.clientHeight;
+
+    // Horizontal scroll
+    if (cellX < viewLeft) {
+      this.container.scrollLeft = cellX;
+    } else if (cellX + cellWidth > viewRight) {
+      this.container.scrollLeft =
+        cellX + cellWidth + cellWidth / 2 - this.container.clientWidth;
+    }
+
+    // Vertical scroll
+    if (cellY < viewTop) {
+      this.container.scrollTop = cellY;
+    } else if (cellY + cellHeight > viewBottom) {
+      this.container.scrollTop =
+        cellY + cellHeight - this.container.clientHeight;
+    }
+  }
+
+  _inputDisplayNone() {
+    this.cellInput.style.display = "none";
+  }
+}
